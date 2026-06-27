@@ -37,9 +37,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="min-h-screen md:h-screen md:overflow-hidden bg-stone-950 flex flex-col md:flex-row pb-16 md:pb-0">
       
       {/* --- DESKTOP SIDEBAR --- */}
-      <aside className="hidden md:flex md:w-64 bg-stone-900 border-r border-stone-800 flex-col shrink-0">
+      <aside className="hidden md:flex md:w-64 bg-stone-900 flex-col shrink-0">
         {/* Brand Header */}
-        <div className="p-6 border-b border-stone-800 flex items-center gap-3">
+        <div className="p-6 flex items-center gap-3">
           <div className="w-10 h-10 rounded-full overflow-hidden bg-stone-950 border border-gold-500/20 flex items-center justify-center shrink-0">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
@@ -80,7 +80,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Top Header bar */}
-        <header className="h-16 border-b border-stone-800/80 bg-stone-900/60 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 shrink-0">
+        <header className="h-16 bg-stone-900/60 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-3">
             {/* Mobile Brand indicator */}
             <div className="flex md:hidden items-center gap-2">
@@ -121,9 +121,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </div>
 
-            {/* Separator */}
-            <div className="w-px h-6 bg-stone-800" />
-
             {/* Profile section */}
             <div className="flex items-center gap-3 pl-1">
               {/* User text (hidden on small viewports, visible on md+) */}
@@ -161,7 +158,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* --- MOBILE BOTTOM NAVIGATION BAR --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-stone-900/90 backdrop-blur-lg border-t border-stone-800 flex items-center justify-around px-2 z-40">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-stone-900/90 backdrop-blur-lg flex items-center justify-around px-2 z-40">
         {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
