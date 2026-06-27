@@ -11,6 +11,7 @@ import { AlertCircle, Camera, CheckCircle2 } from 'lucide-react';
 
 export const ShopStatus: React.FC = () => {
   const { config, isConnected, setConfig } = useStoreConfigStore();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [noticeText, setNoticeText] = useState('');

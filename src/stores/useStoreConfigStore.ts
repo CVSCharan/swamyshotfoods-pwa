@@ -37,7 +37,7 @@ export const useStoreConfigStore = create<StoreConfigStore>((set) => ({
 
   setConfig: (config) => set({ config, error: null }),
   setConnected: (connected) => set({ isConnected: connected }),
-  setError: (error) => set({ error, isConnected: false }),
+  setError: (error) => set({ error }),
   updateConfigField: (field, value) =>
     set((state) => ({
       config: state.config ? { ...state.config, [field]: value } : null,

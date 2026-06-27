@@ -14,6 +14,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuthStore();
   const { isConnected } = useStoreConfigStore();
 
+
   const handleLogoutClick = () => {
     if (confirm('Are you sure you want to log out?')) {
       logout().then(() => {
