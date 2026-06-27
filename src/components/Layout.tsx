@@ -53,19 +53,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        {/* User Quick Info */}
-        <div className="px-6 py-4 border-b border-stone-800 bg-stone-900/50 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-gold-500/10 border border-gold-500/20 flex items-center justify-center font-display font-bold text-gold-500 text-sm">
-            {user?.username?.charAt(0).toUpperCase() || 'U'}
-          </div>
-          <div className="overflow-hidden">
-            <p className="text-xs font-bold text-stone-200 truncate">{user?.username}</p>
-            <span className="text-[9px] px-2 py-0.5 rounded-full bg-stone-800 text-stone-400 font-semibold uppercase tracking-wider border border-stone-700 mt-1 inline-block">
-              {user?.role}
-            </span>
-          </div>
-        </div>
-
         {/* Sidebar Nav */}
         <nav className="flex-1 px-4 py-6 space-y-1">
           {filteredNavItems.map((item) => {
@@ -87,17 +74,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             );
           })}
         </nav>
-
-        {/* Sidebar Footer / Logout */}
-        <div className="p-4 border-t border-stone-800">
-          <button
-            onClick={handleLogoutClick}
-            className="flex items-center gap-3 w-full px-4 py-3 text-stone-400 hover:text-red-400 hover:bg-red-500/5 rounded-xl text-sm font-semibold font-display transition-all duration-200 cursor-pointer"
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
-        </div>
       </aside>
 
       {/* --- MAIN PAGE CONTENT WRAPPER --- */}
@@ -122,13 +98,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </span>
           </div>
 
-          {/* Real-time Connection status */}
+          {/* Real-time Connection status & User Profile */}
           <div className="flex items-center gap-4">
+            {/* Connection Dot */}
             <div className="flex items-center gap-2 bg-stone-900 px-3 py-1.5 rounded-full border border-stone-800">
               {isConnected ? (
                 <>
                   <Wifi size={14} className="text-emerald-500" />
-                  <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider font-display">
+                  <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider font-display hidden sm:inline">
                     Live
                   </span>
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow" />
@@ -136,7 +113,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               ) : (
                 <>
                   <WifiOff size={14} className="text-red-500" />
-                  <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider font-display">
+                  <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider font-display hidden sm:inline">
                     Offline
                   </span>
                   <span className="w-2 h-2 rounded-full bg-red-500" />
@@ -144,13 +121,33 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </div>
 
-            {/* Mobile Logout shortcut */}
-            <button
-              onClick={handleLogoutClick}
-              className="md:hidden p-2 rounded-xl text-stone-400 hover:text-red-400 hover:bg-stone-800 border border-stone-800 cursor-pointer"
-            >
-              <LogOut size={16} />
-            </button>
+            {/* Separator */}
+            <div className="w-px h-6 bg-stone-800" />
+
+            {/* Profile section */}
+            <div className="flex items-center gap-3 pl-1">
+              {/* User text (hidden on small viewports, visible on md+) */}
+              <div className="hidden md:flex flex-col items-end leading-none gap-1">
+                <span className="text-xs font-bold text-stone-200">{user?.username}</span>
+                <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-stone-800 text-stone-400 font-semibold uppercase tracking-wider border border-stone-700">
+                  {user?.role}
+                </span>
+              </div>
+
+              {/* Avatar circle */}
+              <div className="w-8 h-8 rounded-full bg-gold-500/10 border border-gold-500/20 flex items-center justify-center font-display font-bold text-gold-500 text-sm shrink-0">
+                {user?.username?.charAt(0).toUpperCase() || 'U'}
+              </div>
+
+              {/* Logout button */}
+              <button
+                onClick={handleLogoutClick}
+                className="p-1.5 rounded-xl text-stone-400 hover:text-red-400 hover:bg-stone-800 border border-stone-800 cursor-pointer transition-colors duration-200"
+                title="Logout"
+              >
+                <LogOut size={14} />
+              </button>
+            </div>
           </div>
         </header>
 
