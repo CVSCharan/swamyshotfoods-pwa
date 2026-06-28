@@ -32,6 +32,16 @@ class ApiClient {
 
   private async handleResponse<T>(response: Response): Promise<T> {
     if (response.status === 401) {
+      // Do not trigger session expiry reload for authentication requests (login/register)
+      if (response.url.includes('/auth/login') || response.url.includes('/auth/register')) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new ApiError(
+          errorData.message || 'Invalid credentials',
+          401,
+          errorData,
+        );
+      }
+
       console.log('🔐 401 Unauthorized - Logging out user');
 
       // Clear tokens
