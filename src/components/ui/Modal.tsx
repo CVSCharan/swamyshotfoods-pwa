@@ -44,7 +44,7 @@ export const Modal: React.FC<ModalProps> = ({
         className={`relative w-full max-w-lg shadow-2xl z-10 animate-slide-up border border-stone-800/80 max-h-[85vh] flex flex-col ${className}`}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-stone-800/60 shrink-0">
+        <div className="flex items-center justify-between px-5 py-4 shrink-0">
           {title ? (
             <h3 className="font-display text-lg font-bold text-stone-100 tracking-tight">
               {title}

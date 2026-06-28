@@ -29,7 +29,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
 }) => {
   return (
     <div
-      className={`px-5 py-4 border-b border-stone-800 flex flex-col gap-1 ${className}`}
+      className={`px-5 py-4 flex flex-col gap-1 ${className}`}
       {...props}
     >
       {children}

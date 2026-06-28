@@ -191,7 +191,7 @@ export const MenuManagement: React.FC = () => {
             <Card key={item._id} hoverable className="p-1 flex flex-col justify-between h-full">
               <div>
                 {/* Food Image */}
-                <div className="h-44 w-full rounded-t-xl bg-stone-800 overflow-hidden relative border-b border-stone-850">
+                <div className="h-44 w-full rounded-t-xl bg-stone-800 overflow-hidden relative">
                   {item.imgSrc ? (
                     <img
                       src={item.imgSrc}
@@ -231,7 +231,7 @@ export const MenuManagement: React.FC = () => {
               </div>
 
               {/* Action buttons */}
-              <div className="p-4 pt-0 border-t border-stone-800/40 flex items-center justify-between gap-3 mt-4 shrink-0">
+              <div className="p-4 pt-0 flex items-center justify-between gap-3 mt-4 shrink-0">
                 <div className="flex items-center gap-1.5 bg-stone-900/50 px-2 py-1 rounded-lg border border-stone-850 text-[10px] text-stone-400 font-semibold uppercase tracking-wider">
                   <SlidersHorizontal size={10} className="text-gold-500" />
                   Priority: {item.priority}
@@ -323,7 +323,7 @@ export const MenuManagement: React.FC = () => {
             placeholder="Https://example.com/image.jpg"
           />
 
-          <div className="flex items-center gap-3 pt-4 border-t border-stone-850 shrink-0">
+          <div className="flex items-center gap-3 pt-4 shrink-0">
             <Button
               className="flex-1"
               onClick={isEditModalVisible ? handleUpdateItem : handleAddItem}
@@ -357,7 +357,7 @@ export const MenuManagement: React.FC = () => {
             Are you sure you want to delete <span className="font-extrabold text-gold-500">"{selectedItem?.name}"</span>? This action is permanent and cannot be undone.
           </p>
 
-          <div className="flex items-center gap-3 pt-4 border-t border-stone-850">
+          <div className="flex items-center gap-3 pt-4">
             <Button
               variant="danger"
               className="flex-1"
