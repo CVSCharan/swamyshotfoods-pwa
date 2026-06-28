@@ -1,32 +1,70 @@
-# React + TypeScript + Vite
+# Swamy's Hot Foods - PWA Admin Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A lightweight, premium, real-time Progressive Web Application (PWA) Admin Portal built to manage shop status, notice boards, holiday modes, and food menu operations for Swamy's Hot Foods.
 
-Currently, two official plugins are available:
+Designed with a high-fidelity, dark-mode obsidian interface featuring saffron orange highlights, smooth transition states, and a clean frameless responsive layout.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🚀 Key Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+*   **Real-time Event Broadcasting (SSE)**: Automatically syncs shop status updates, notice boards, and timing configurations across all active dashboards in real-time.
+*   **Dual-Channel Reliable Loading (HTTP GET + SSE)**: Avoids infinite loader screens on slow networks by fetching initial configurations immediately via a standard HTTP GET call, then opening an EventSource stream for subsequent updates.
+*   **Leak-Proof Connection Lifecycle**: Utilizes custom connection tracking refs to cancel stale API updates and abort/clean up EventSource connections, preventing memory leaks during fast page navigations or React StrictMode double mounts.
+*   **Premium Frameless Layout**: Relocates user account controls to a compact dropdown in the top header navbar, completely eliminating borders, dividers, and sidebar clutter for a modern, seamless design.
+*   **Complete Offline Resilience**: Detects network disconnections, dynamically switches to a secure cached state, showing an `OFFLINE` status dot, and initiates an automatic reconnection loop.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 🛠 Tech Stack
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+*   **Frontend**: React (v18) + TypeScript
+*   **Build Tool**: Vite (v8)
+*   **State Management**: Zustand
+*   **Icons**: Lucide React
+*   **Styling**: Tailwind CSS (obsidian base `#0c0a09` + gold/saffron accents `#d97706`)
+*   **Offline/Service Workers**: Vite PWA Plugin (`vite-plugin-pwa` generating service workers)
+
+---
+
+## 📦 Project Setup
+
+### 1. Environment Configuration
+Create a `.env.development` or `.env.production` file in the root of the project to set the API endpoints:
+
+```env
+VITE_API_URL=http://localhost:5001/api
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+*(Note: `.env*` files are ignored by git to keep credentials and local environment configs secure.)*
+
+### 2. Install Dependencies
+Run the package installation:
+```bash
+npm install
+```
+
+### 3. Run Development Server
+Start the Vite development server (typically launches on port `5173`):
+```bash
+npm run dev
+```
+
+### 4. Build for Production
+Compiles the TypeScript application and packages the static assets along with service worker scripts into the `dist/` directory:
+```bash
+npm run build
+```
+
+---
+
+## 💡 Architecture Notes
+
+### EventSource Lifecycle & Race Condition Protection
+Under the hood, real-time sync is managed by the `useStoreConfigSSE` hook. To ensure React's async operations don't leak, connection IDs are tracked:
+*   When `connect()` is fired, an internal `connectionIdRef` is incremented.
+*   If the hook unmounts or `disconnect()` is called during the HTTP GET fetch, the callback detects the ID change (`currentId !== connectionIdRef.current`) and cancels further setup.
+*   This prevents duplicate background EventSources and guarantees that memory is cleaned up correctly during rapid page toggles.
+
+### Authentication Response Interceptors
+The global client interceptor in `api.ts` filters out authentication requests (like `/auth/login`) from general `401 Unauthorized` handling. This allows invalid credentials to throw validation errors back to the login page (displaying "Invalid credentials" in the UI) rather than falsely triggering a "session has expired" alert-reload loop.
