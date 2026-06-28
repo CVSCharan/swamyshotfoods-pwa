@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { useStoreConfigStore } from '../stores/useStoreConfigStore';
+import { storeConfigService } from '../services/storeConfigService';
 import { config } from '../config/env';
 
 // Construct the correct SSE URL
@@ -11,12 +12,22 @@ export const useStoreConfigSSE = () => {
   const reconnectTimeoutRef = useRef<number | null>(null);
   const { setConfig, setConnected, setError } = useStoreConfigStore();
 
-  const connect = () => {
+  const connect = async () => {
     // Close existing connection if any
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
 
+    // 1. Fetch initial configuration via HTTP GET to prevent stuck loading state
+    try {
+      const initialConfig = await storeConfigService.get();
+      setConfig(initialConfig);
+    } catch (err) {
+      console.error('❌ Failed to fetch initial store config via GET:', err);
+      // Do not block the EventSource connection; SSE might still connect or handle errors
+    }
+
+    // 2. Open EventSource for real-time config updates
     try {
       console.log('🔌 Connecting to SSE:', SSE_URL);
       const eventSource = new EventSource(SSE_URL);
