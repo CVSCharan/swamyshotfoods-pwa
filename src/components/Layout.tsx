@@ -34,7 +34,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen md:h-screen md:overflow-hidden bg-stone-950 flex flex-col md:flex-row pb-16 md:pb-0">
+    <div className="min-h-screen md:h-screen md:overflow-hidden bg-stone-950 flex flex-col md:flex-row pb-content-safe md:pb-0">
       
       {/* --- DESKTOP SIDEBAR --- */}
       <aside className="hidden md:flex md:w-64 bg-stone-900 flex-col shrink-0">
@@ -80,7 +80,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0">
         
         {/* Top Header bar */}
-        <header className="h-16 bg-stone-900/60 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 shrink-0">
+        <header className="h-header-safe pt-safe md:h-16 md:pt-0 bg-stone-900/60 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 shrink-0">
           <div className="flex items-center gap-3">
             {/* Mobile Brand indicator */}
             <div className="flex md:hidden items-center gap-2">
@@ -158,7 +158,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       {/* --- MOBILE BOTTOM NAVIGATION BAR --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-stone-900/90 backdrop-blur-lg flex items-center justify-around px-2 z-40">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-nav-safe pb-safe bg-stone-900/90 backdrop-blur-lg flex items-center justify-around px-2 z-40">
         {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
