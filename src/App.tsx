@@ -42,18 +42,35 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
   return <Layout>{children}</Layout>;
 };
 
-// SSE Manager Wrapper to connect/disconnect based on Auth state
+// SSE Manager Wrapper to connect/disconnect based on Auth state and page visibility
 const SSEManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
   const { connect, disconnect } = useStoreConfigSSE();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      connect();
-    } else {
+    if (!isAuthenticated) {
       disconnect();
+      return;
     }
+
+    // Initial connection
+    connect();
+
+    // Battery Optimization: disconnect when tab is backgrounded, reconnect when active
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('🔋 Visibility: hidden - pausing SSE connection');
+        disconnect();
+      } else {
+        console.log('🔋 Visibility: visible - resuming SSE connection');
+        connect();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       disconnect();
     };
   }, [isAuthenticated]);
