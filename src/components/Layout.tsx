@@ -92,7 +92,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="flex-1 flex flex-col min-w-0 bg-neutral-50 h-full relative">
         
         {/* Top Header bar */}
-        <header className="h-16 shrink-0 bg-white/80 backdrop-blur-md border-b border-neutral-200 px-6 flex items-center justify-between sticky top-0 z-30">
+        <header className="h-header-safe pt-safe md:h-16 md:pt-0 shrink-0 bg-white/80 backdrop-blur-md border-b border-neutral-200 px-6 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">
             {/* Mobile Brand indicator */}
             <div className="flex md:hidden items-center gap-2">

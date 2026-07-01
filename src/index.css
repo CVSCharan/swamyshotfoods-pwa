@@ -107,7 +107,7 @@ html, body {
   height: calc(4rem + env(safe-area-inset-top, 0px));
 }
 .h-nav-safe {
-  height: calc(5rem + env(safe-area-inset-bottom, 0px));
+  height: calc(4rem + env(safe-area-inset-bottom, 0px));
 }
 .pb-content-safe {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
