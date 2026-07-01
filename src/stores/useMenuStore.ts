@@ -5,6 +5,7 @@ export interface MenuItem {
   name: string;
   price: number;
   desc: string;
+  timingTemplate?: string;
   morningTimings?: {
     startTime: string;
     endTime: string;
@@ -14,6 +15,10 @@ export interface MenuItem {
     endTime: string;
   } | null;
   ingredients: string;
+  allergens?: string[];
+  dietaryLabels?: string[];
+  morningSpecial?: boolean;
+  eveningSpecial?: boolean;
   priority: number;
   imgSrc: string;
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, Search, SlidersHorizontal } from 'lucide-react';
 import { useMenuStore } from '../stores/useMenuStore';
 import type { MenuItem } from '../stores/useMenuStore';
-import { menuService } from '../services/menuService';
+import { menuService, type TimingTemplate } from '../services/menuService';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -25,6 +25,7 @@ export const MenuManagement: React.FC = () => {
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [templates, setTemplates] = useState<TimingTemplate[]>([]);
 
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     name: '',
@@ -39,7 +40,17 @@ export const MenuManagement: React.FC = () => {
 
   useEffect(() => {
     fetchMenuItems();
+    fetchTemplates();
   }, []);
+
+  const fetchTemplates = async () => {
+    try {
+      const data = await menuService.getTimingTemplates();
+      setTemplates(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -135,6 +146,13 @@ export const MenuManagement: React.FC = () => {
       ingredients: '',
       priority: 1,
       imgSrc: '',
+      timingTemplate: '',
+      allergens: [],
+      dietaryLabels: [],
+      morningSpecial: false,
+      eveningSpecial: false,
+      morningTimings: null,
+      eveningTimings: null,
     });
     setFormErrors({});
     setSelectedItem(null);
@@ -322,6 +340,136 @@ export const MenuManagement: React.FC = () => {
             onChange={(e) => setFormData({ ...formData, imgSrc: e.target.value })}
             placeholder="Https://example.com/image.jpg"
           />
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Timing Template</label>
+            <select
+              value={formData.timingTemplate || ''}
+              onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
+              className="w-full px-4 py-3 glass-input rounded-xl text-sm placeholder-neutral-400 focus:ring-2 focus:ring-saffron-500/20 transition-all duration-200"
+            >
+              <option value="">No Template (Use Custom)</option>
+              {templates.map(t => (
+                <option key={t.key} value={t.key}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {!formData.timingTemplate && (
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Custom Timings</label>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Morning Start"
+                  value={formData.morningTimings?.startTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
+                  })}
+                  placeholder="08:00"
+                />
+                <Input
+                  label="Morning End"
+                  value={formData.morningTimings?.endTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
+                  })}
+                  placeholder="11:30"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Evening Start"
+                  value={formData.eveningTimings?.startTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
+                  })}
+                  placeholder="16:00"
+                />
+                <Input
+                  label="Evening End"
+                  value={formData.eveningTimings?.endTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
+                  })}
+                  placeholder="22:30"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Allergens</label>
+            <div className="flex flex-wrap gap-3">
+              {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => (
+                <label key={allergen} className="flex items-center gap-2 text-sm text-neutral-600">
+                  <input
+                    type="checkbox"
+                    checked={formData.allergens?.includes(allergen) || false}
+                    onChange={(e) => {
+                      const current = formData.allergens || [];
+                      const updated = e.target.checked
+                        ? [...current, allergen]
+                        : current.filter(a => a !== allergen);
+                      setFormData({ ...formData, allergens: updated });
+                    }}
+                    className="rounded text-saffron-500 focus:ring-saffron-500"
+                  />
+                  {allergen}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Dietary Labels</label>
+            <div className="flex flex-wrap gap-3">
+              {['Vegan', 'Jain', 'Gluten-Free', 'Halal'].map(label => (
+                <label key={label} className="flex items-center gap-2 text-sm text-neutral-600">
+                  <input
+                    type="checkbox"
+                    checked={formData.dietaryLabels?.includes(label) || false}
+                    onChange={(e) => {
+                      const current = formData.dietaryLabels || [];
+                      const updated = e.target.checked
+                        ? [...current, label]
+                        : current.filter(l => l !== label);
+                      setFormData({ ...formData, dietaryLabels: updated });
+                    }}
+                    className="rounded text-saffron-500 focus:ring-saffron-500"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Specials</label>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 text-sm text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={formData.morningSpecial || false}
+                  onChange={(e) => setFormData({ ...formData, morningSpecial: e.target.checked })}
+                  className="rounded text-saffron-500 focus:ring-saffron-500"
+                />
+                Morning Special
+              </label>
+              <label className="flex items-center gap-2 text-sm text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={formData.eveningSpecial || false}
+                  onChange={(e) => setFormData({ ...formData, eveningSpecial: e.target.checked })}
+                  className="rounded text-saffron-500 focus:ring-saffron-500"
+                />
+                Evening Special
+              </label>
+            </div>
+          </div>
 
           <div className="flex items-center gap-3 pt-4 shrink-0">
             <Button

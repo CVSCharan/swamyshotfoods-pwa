@@ -46,22 +46,22 @@ If you or another agent need to understand or modify specific features, here are
 Here is the progress checklist corresponding to the current system audit and proposed synchronization fixes:
 
 ### 🛡️ 1. API Security & Integrity
-- [ ] **Secure User Registration**: Require Admin auth for `POST /api/auth/register` to prevent unauthorized admin creation.
-- [ ] **Clean Malformed Database Timings**: Convert malformed evening timing strings (e.g. `"4:3pm"`, `"0:00pm"`) to standard 24h `"HH:MM"` (e.g. `"16:30"`, `"20:30"`).
-- [ ] **Unified Ingredients Schema**: Standardize the ingredients data model and inputs as single comma-separated strings across the PWA/Web clients and Mongoose model.
+- [x] **Secure User Registration**: Require Admin auth for `POST /api/auth/register` to prevent unauthorized admin creation.
+- [x] **Clean Malformed Database Timings**: Convert malformed evening timing strings (e.g. `"4:3pm"`, `"0:00pm"`) to standard 24h `"HH:MM"` (e.g. `"16:30"`, `"20:30"`).
+- [x] **Unified Ingredients Schema**: Standardize the ingredients data model and inputs as single comma-separated strings across the PWA/Web clients and Mongoose model.
 
 ### 🕒 2. Timing Templates Resolution (Backend)
-- [ ] **Inject Templates Repository**: Pass the `TimingTemplateRepository` into `MenuService`.
-- [ ] **Resolve Template Timings**: Program `MenuService` to dynamically resolve timing template properties on retrieval requests (`GET /menu`, `GET /menu/:id`, `GET /menu/available/now`).
+- [x] **Inject Templates Repository**: Pass the `TimingTemplateRepository` into `MenuService`.
+- [x] **Resolve Template Timings**: Program `MenuService` to dynamically resolve timing template properties on retrieval requests (`GET /menu`, `GET /menu/:id`, `GET /menu/available/now`).
 
 ### ⚙️ 3. PWA Timing & Customization UI (Admin Panel)
-- [ ] **Timing Model Inputs**: Add dropdowns to select Predefined Timing Templates and inputs for Custom Morning/Evening timings in `MenuManagement.tsx`.
-- [ ] **Allergen & Dietary Editor**: Add checkboxes for allergens (dairy, nuts, gluten, soy) and dietary labels (vegan, jain, gluten-free) to Menu Item addition/editing.
-- [ ] **Admin API Services**: Add API client methods to request templates and update assigned timings.
+- [x] **Timing Model Inputs**: Add dropdowns to select Predefined Timing Templates and inputs for Custom Morning/Evening timings in `MenuManagement.tsx`.
+- [x] **Allergen & Dietary Editor**: Add checkboxes for allergens (dairy, nuts, gluten, soy) and dietary labels (vegan, jain, gluten-free) to Menu Item addition/editing.
+- [x] **Admin API Services**: Add API client methods to request templates and update assigned timings.
 
 ### 🌐 4. Web Application Global Sync
-- [ ] **Global Store Status Hook**: Relocate `useStoreConfigSSE()` connection from `page.tsx` to the global `Header` component.
-- [ ] **Fix Deep Link Inconsistencies**: Ensure direct refreshes on pages like `/menu` load the dynamic store configuration, notice board, and menu footer message.
+- [x] **Global Store Status Hook**: Relocate `useStoreConfigSSE()` connection from `page.tsx` to the global `Header` component.
+- [x] **Fix Deep Link Inconsistencies**: Ensure direct refreshes on pages like `/menu` load the dynamic store configuration, notice board, and menu footer message.
 
 ---
 
