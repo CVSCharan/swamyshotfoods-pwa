@@ -13,6 +13,7 @@ export const ShopStatus: React.FC = () => {
   const { config, isConnected, setConfig } = useStoreConfigStore();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cookingInputRef = useRef<HTMLInputElement>(null);
 
   const [noticeText, setNoticeText] = useState('');
   const [holidayText, setHolidayText] = useState('');
@@ -73,15 +74,40 @@ export const ShopStatus: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
+  const handleCookingImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File is too large. Max size is 2MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async () => {
+      if (typeof reader.result === 'string') {
+        await updateConfig({ cookingImageUrl: reader.result });
+      }
+    };
+    reader.onerror = () => {
+      showNotification('Failed to read image file', 'error');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const triggerFileSelect = () => {
     fileInputRef.current?.click();
   };
 
+  const triggerCookingSelect = () => {
+    cookingInputRef.current?.click();
+  };
+
   if (!config) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[50vh] text-stone-400 font-display">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] text-neutral-500 font-display">
         <svg
-          className="animate-spin h-8 w-8 text-gold-500 mb-4"
+          className="animate-spin h-8 w-8 text-saffron-500 mb-4"
           fill="none"
           viewBox="0 0 24 24"
         >
@@ -99,14 +125,15 @@ export const ShopStatus: React.FC = () => {
       {/* Toast Notification */}
       {message && (
         <div
-          className={`fixed top-4 right-4 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-xl font-display font-semibold text-xs animate-slide-up ${
+          className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-5 py-3.5 rounded-full border shadow-2xl font-display font-bold text-sm animate-slide-up bg-white max-w-[90vw] whitespace-nowrap ${
             message.type === 'success'
-              ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/25'
-              : 'bg-red-500/10 text-red-500 border-red-500/25'
+              ? 'text-emerald-600 border-emerald-200 shadow-emerald-500/20'
+              : 'text-red-600 border-red-200 shadow-red-500/20'
           }`}
+          style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
         >
-          {message.type === 'success' ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
-          {message.text}
+          {message.type === 'success' ? <CheckCircle2 size={20} className="text-emerald-500 shrink-0" /> : <AlertCircle size={20} className="text-red-500 shrink-0" />}
+          <span className="truncate">{message.text}</span>
         </div>
       )}
 
@@ -123,10 +150,10 @@ export const ShopStatus: React.FC = () => {
         <Card hoverable className="p-1">
           <CardContent className="flex items-center justify-between py-6">
             <div>
-              <p className="text-xs font-semibold text-stone-400 font-display uppercase tracking-wider mb-1">
+              <p className="text-xs font-semibold text-neutral-500 font-display uppercase tracking-wider mb-1">
                 Shop Status
               </p>
-              <h2 className="font-display font-black text-2xl text-stone-100 mb-2">
+              <h2 className="font-display font-black text-2xl text-neutral-900 mb-2">
                 {config.isShopOpen ? 'Open for Business' : 'Closed Right Now'}
               </h2>
               <Badge variant={config.isShopOpen ? 'success' : 'destructive'}>
@@ -142,26 +169,65 @@ export const ShopStatus: React.FC = () => {
         </Card>
 
         <Card hoverable className="p-1">
-          <CardContent className="flex items-center justify-between py-6">
-            <div>
-              <p className="text-xs font-semibold text-stone-400 font-display uppercase tracking-wider mb-1">
-                Kitchen State
-              </p>
-              <h2 className="font-display font-black text-2xl text-stone-100 mb-2">
-                {config.isCooking ? 'Cooking Active' : 'Kitchen Resting'}
-              </h2>
-              <Badge variant={config.isCooking ? 'success' : 'secondary'}>
-                {config.isCooking ? 'Cooking ON' : 'Cooking OFF'}
-              </Badge>
+          <CardContent className="flex flex-col gap-4 py-6">
+            <div className="flex items-center justify-between w-full">
+              <div>
+                <p className="text-xs font-semibold text-neutral-500 font-display uppercase tracking-wider mb-1">
+                  Kitchen State
+                </p>
+                <h2 className="font-display font-black text-2xl text-neutral-900 mb-2">
+                  {config.isCooking ? 'Cooking Active' : 'Kitchen Resting'}
+                </h2>
+                <Badge variant={config.isCooking ? 'success' : 'secondary'}>
+                  {config.isCooking ? 'Cooking ON' : 'Cooking OFF'}
+                </Badge>
+              </div>
+              <Switch
+                checked={config.isCooking}
+                onChange={(val) => updateConfig({ isCooking: val })}
+                disabled={loading}
+              />
             </div>
-            <Switch
-              checked={config.isCooking}
-              onChange={(val) => updateConfig({ isCooking: val })}
-              disabled={loading}
-            />
           </CardContent>
         </Card>
       </div>
+
+      {/* Cooking Media Upload - Separate Card */}
+      {config.isCooking && (
+        <Card className="p-1 animate-fade-in">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle>Cooking GIF/Image</CardTitle>
+              <CardDescription>Displayed on the website when cooking is on</CardDescription>
+            </div>
+            <div>
+              <input
+                type="file"
+                ref={cookingInputRef}
+                onChange={handleCookingImageChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <Button variant="outline" size="sm" onClick={triggerCookingSelect} loading={loading}>
+                Change Media
+              </Button>
+            </div>
+          </CardHeader>
+          {config.cookingImageUrl && (
+            <CardContent className="flex justify-center pt-4">
+              <div className="relative group w-32 h-32 rounded-2xl overflow-hidden border-2 border-neutral-200 bg-white shadow-xl">
+                <img src={config.cookingImageUrl} alt="Cooking Media" className="w-full h-full object-cover" />
+                <button
+                  onClick={triggerCookingSelect}
+                  className="absolute inset-0 bg-neutral-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                >
+                  <Camera size={18} className="text-white" />
+                </button>
+              </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
 
       {/* Owner Profile Photo */}
       <Card className="p-1">
@@ -186,14 +252,14 @@ export const ShopStatus: React.FC = () => {
         {config.ownerAvatarUrl && (
           <CardContent className="flex justify-center pt-4">
             <div className="relative group">
-              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gold-500 shadow-xl bg-stone-900">
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-saffron-500 shadow-xl bg-white">
                 <img src={config.ownerAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
               </div>
               <button
                 onClick={triggerFileSelect}
-                className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+                className="absolute inset-0 bg-neutral-900/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
               >
-                <Camera size={18} className="text-stone-100" />
+                <Camera size={18} className="text-white" />
               </button>
             </div>
           </CardContent>

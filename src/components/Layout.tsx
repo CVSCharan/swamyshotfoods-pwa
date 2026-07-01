@@ -14,7 +14,6 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuthStore();
   const { isConnected } = useStoreConfigStore();
 
-
   const handleLogoutClick = () => {
     if (confirm('Are you sure you want to log out?')) {
       logout().then(() => {
@@ -34,27 +33,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 
   return (
-    <div className="min-h-screen md:h-screen md:overflow-hidden bg-stone-950 flex flex-col md:flex-row pb-content-safe md:pb-0">
+    <div className="h-screen w-full flex overflow-hidden bg-neutral-50 text-neutral-900 font-sans">
       
       {/* --- DESKTOP SIDEBAR --- */}
-      <aside className="hidden md:flex md:w-64 bg-stone-900 flex-col shrink-0">
+      <aside className="hidden md:flex flex-col w-64 bg-white border-r border-neutral-200 shrink-0 h-full">
         {/* Brand Header */}
-        <div className="p-6 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-stone-950 border border-gold-500/20 flex items-center justify-center shrink-0">
+        <div className="h-16 shrink-0 flex items-center gap-3 px-6 border-b border-neutral-200">
+          <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-50 border border-saffron-500/20 flex items-center justify-center shrink-0">
             <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
           </div>
-          <div>
-            <h1 className="font-display font-bold text-stone-100 text-sm tracking-wide">
+          <div className="flex flex-col">
+            <h1 className="font-display font-bold text-neutral-900 text-sm tracking-wide leading-tight">
               Swamy's Hot Foods
             </h1>
-            <p className="text-[10px] text-gold-500 font-display font-semibold tracking-widest uppercase">
+            <p className="text-[10px] text-saffron-500 font-display font-semibold tracking-widest uppercase">
               Pure Veg
             </p>
           </div>
         </div>
 
         {/* Sidebar Nav */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
+        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-1">
           {filteredNavItems.map((item) => {
             const isActive = location.pathname === item.path;
             const Icon = item.icon;
@@ -64,8 +63,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 to={item.path}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold font-display transition-all duration-200 ${
                   isActive
-                    ? 'bg-gold-500 text-stone-950 shadow-[0_4px_12px_rgba(244,196,48,0.15)]'
-                    : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                    ? 'bg-saffron-500 text-white shadow-[0_4px_12px_rgba(255,149,0,0.15)]'
+                    : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-100/50'
                 }`}
               >
                 <Icon size={18} />
@@ -74,72 +73,60 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             );
           })}
         </nav>
+        
+        {/* Connection Status placed at bottom of Sidebar for clean UI */}
+        <div className="p-4 shrink-0 border-t border-neutral-200">
+           <div className={`flex items-center justify-between px-3 py-2 rounded-lg border ${isConnected ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
+              <div className="flex items-center gap-2">
+                {isConnected ? <Wifi size={14} className="text-emerald-500" /> : <WifiOff size={14} className="text-red-500" />}
+                <span className={`text-[10px] font-bold uppercase tracking-wider font-display ${isConnected ? 'text-emerald-500' : 'text-red-500'}`}>
+                  {isConnected ? 'System Live' : 'Offline'}
+                </span>
+              </div>
+              <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse-slow' : 'bg-red-500'}`} />
+           </div>
+        </div>
       </aside>
 
-      {/* --- MAIN PAGE CONTENT WRAPPER --- */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* --- MAIN CONTENT AREA --- */}
+      <div className="flex-1 flex flex-col min-w-0 bg-neutral-50 h-full relative">
         
         {/* Top Header bar */}
-        <header className="h-header-safe pt-safe md:h-16 md:pt-0 bg-stone-900/60 backdrop-blur-md px-6 flex items-center justify-between sticky top-0 z-30 shrink-0">
+        <header className="h-16 shrink-0 bg-white/80 backdrop-blur-md border-b border-neutral-200 px-6 flex items-center justify-between sticky top-0 z-30">
           <div className="flex items-center gap-3">
             {/* Mobile Brand indicator */}
             <div className="flex md:hidden items-center gap-2">
-              <div className="w-8 h-8 rounded-full overflow-hidden bg-stone-950 border border-gold-500/20">
+              <div className="w-8 h-8 rounded-full overflow-hidden bg-neutral-50 border border-saffron-500/20">
                 <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
               </div>
-              <span className="font-display font-extrabold text-sm text-gold-500">
+              <span className="font-display font-extrabold text-sm text-saffron-500">
                 Swamy's
               </span>
             </div>
             
             {/* Page title placeholder */}
-            <span className="hidden md:inline-block text-xs font-semibold text-stone-400 font-display uppercase tracking-wider">
+            <span className="hidden md:inline-block text-xs font-semibold text-neutral-500 font-display uppercase tracking-wider">
               {navItems.find((item) => item.path === location.pathname)?.label || 'Portal'}
             </span>
           </div>
 
-          {/* Real-time Connection status & User Profile */}
+          {/* Profile section */}
           <div className="flex items-center gap-4">
-            {/* Connection Dot */}
-            <div className="flex items-center gap-2 bg-stone-900 px-3 py-1.5 rounded-full border border-stone-800">
-              {isConnected ? (
-                <>
-                  <Wifi size={14} className="text-emerald-500" />
-                  <span className="text-[10px] text-emerald-500 font-bold uppercase tracking-wider font-display hidden sm:inline">
-                    Live
-                  </span>
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow" />
-                </>
-              ) : (
-                <>
-                  <WifiOff size={14} className="text-red-500" />
-                  <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider font-display hidden sm:inline">
-                    Offline
-                  </span>
-                  <span className="w-2 h-2 rounded-full bg-red-500" />
-                </>
-              )}
-            </div>
-
-            {/* Profile section */}
-            <div className="flex items-center gap-3 pl-1">
-              {/* User text (hidden on small viewports, visible on md+) */}
+            <div className="flex items-center gap-3">
               <div className="hidden md:flex flex-col items-end leading-none gap-1">
-                <span className="text-xs font-bold text-stone-200">{user?.username}</span>
-                <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-stone-800 text-stone-400 font-semibold uppercase tracking-wider border border-stone-700">
+                <span className="text-xs font-bold text-neutral-900">{user?.username}</span>
+                <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-neutral-100 text-neutral-500 font-semibold uppercase tracking-wider border border-neutral-200">
                   {user?.role}
                 </span>
               </div>
 
-              {/* Avatar circle */}
-              <div className="w-8 h-8 rounded-full bg-gold-500/10 border border-gold-500/20 flex items-center justify-center font-display font-bold text-gold-500 text-sm shrink-0">
+              <div className="w-8 h-8 rounded-full bg-saffron-500/10 border border-saffron-500/20 flex items-center justify-center font-display font-bold text-saffron-500 text-sm shrink-0">
                 {user?.username?.charAt(0).toUpperCase() || 'U'}
               </div>
 
-              {/* Logout button */}
               <button
                 onClick={handleLogoutClick}
-                className="p-1.5 rounded-xl text-stone-400 hover:text-red-400 hover:bg-stone-800 border border-stone-800 cursor-pointer transition-colors duration-200"
+                className="p-1.5 rounded-xl text-neutral-500 hover:text-red-500 hover:bg-neutral-100 border border-neutral-200 cursor-pointer transition-colors duration-200"
                 title="Logout"
               >
                 <LogOut size={14} />
@@ -148,37 +135,35 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        {/* Scrollable Container (full width) */}
-        <div className="flex-1 overflow-y-auto">
-          {/* Content area */}
-          <main className="p-6 md:p-8 max-w-5xl w-full mx-auto">
+        {/* Scrollable Main Content */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-8 pb-content-safe">
+          <div className="max-w-5xl w-full mx-auto">
             {children}
-          </main>
-        </div>
-      </div>
+          </div>
+        </main>
 
-      {/* --- MOBILE BOTTOM NAVIGATION BAR --- */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-nav-safe pb-safe bg-stone-900/90 backdrop-blur-lg flex items-center justify-around px-2 z-40">
-        {filteredNavItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-200 ${
-                isActive ? 'text-gold-500' : 'text-stone-500'
-              }`}
-            >
-              <Icon size={20} className={isActive ? 'scale-110' : ''} />
-              <span className="text-[9px] font-bold font-display mt-1 tracking-wide">
-                {item.label.split(' ')[0]}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
-      
+        {/* --- MOBILE BOTTOM NAVIGATION BAR --- */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-nav-safe pb-safe bg-white/90 backdrop-blur-lg border-t border-neutral-200 flex items-center justify-around px-2 z-40">
+          {filteredNavItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex flex-col items-center justify-center w-16 h-12 rounded-xl transition-all duration-200 ${
+                  isActive ? 'text-saffron-500' : 'text-neutral-400 hover:text-neutral-600'
+                }`}
+              >
+                <Icon size={20} className={isActive ? 'scale-110' : ''} />
+                <span className="text-[9px] font-bold font-display mt-1 tracking-wide">
+                  {item.label.split(' ')[0]}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 };

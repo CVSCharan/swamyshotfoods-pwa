@@ -36,24 +36,24 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-neutral-50 flex flex-col items-center justify-center p-4">
       {/* Header */}
       <div className="flex flex-col items-center mb-8 text-center animate-fade-in">
-        <div className="w-24 h-24 rounded-full overflow-hidden bg-stone-900 border-2 border-gold-500/20 shadow-2xl flex items-center justify-center mb-4">
+        <div className="w-24 h-24 rounded-full overflow-hidden bg-white border-2 border-saffron-500/20 shadow-2xl flex items-center justify-center mb-4">
           <img src="/logo.png" alt="Logo" className="w-full h-full object-cover" />
         </div>
-        <h1 className="font-display font-black text-3xl text-gold-500 tracking-tight">
+        <h1 className="font-display font-black text-3xl text-saffron-500 tracking-tight">
           Swamy's Hot Foods
         </h1>
-        <p className="text-xs text-stone-400 font-semibold tracking-widest uppercase mt-1">
+        <p className="text-xs text-neutral-500 font-semibold tracking-widest uppercase mt-1">
           Admin Portal
         </p>
       </div>
 
       {/* Login Card */}
-      <Card className="w-full max-w-md border border-stone-850 p-1 animate-slide-up">
+      <Card className="w-full max-w-md border border-neutral-200 p-1 animate-slide-up">
         <CardHeader>
-          <CardTitle className="text-xl font-extrabold text-stone-100 font-display">Welcome Back</CardTitle>
+          <CardTitle className="text-xl font-extrabold text-neutral-900 font-display">Welcome Back</CardTitle>
           <CardDescription>Sign in to manage your shop, status, and menu</CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,7 +106,7 @@ export const Login: React.FC = () => {
       </Card>
 
       {/* Footer */}
-      <footer className="mt-8 text-center text-xs text-stone-600 font-medium">
+      <footer className="mt-8 text-center text-xs text-neutral-400 font-medium">
         Swamy's Hot Foods © 2026
       </footer>
     </div>
