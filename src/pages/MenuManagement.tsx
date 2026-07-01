@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Edit2, Trash2, Search, SlidersHorizontal } from 'lucide-react';
 import { useMenuStore } from '../stores/useMenuStore';
 import type { MenuItem } from '../stores/useMenuStore';
-import { menuService } from '../services/menuService';
+import { menuService, type TimingTemplate } from '../services/menuService';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -25,6 +25,7 @@ export const MenuManagement: React.FC = () => {
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setDeleteModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [templates, setTemplates] = useState<TimingTemplate[]>([]);
 
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     name: '',
@@ -39,7 +40,17 @@ export const MenuManagement: React.FC = () => {
 
   useEffect(() => {
     fetchMenuItems();
+    fetchTemplates();
   }, []);
+
+  const fetchTemplates = async () => {
+    try {
+      const data = await menuService.getTimingTemplates();
+      setTemplates(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchMenuItems = async () => {
     setLoading(true);
@@ -135,6 +146,13 @@ export const MenuManagement: React.FC = () => {
       ingredients: '',
       priority: 1,
       imgSrc: '',
+      timingTemplate: '',
+      allergens: [],
+      dietaryLabels: [],
+      morningSpecial: false,
+      eveningSpecial: false,
+      morningTimings: null,
+      eveningTimings: null,
     });
     setFormErrors({});
     setSelectedItem(null);
@@ -150,7 +168,7 @@ export const MenuManagement: React.FC = () => {
       {/* Top action header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="relative flex-1 max-w-md">
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-500">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500">
             <Search size={18} />
           </div>
           <input
@@ -158,7 +176,7 @@ export const MenuManagement: React.FC = () => {
             placeholder="Search menu items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-stone-900 border border-stone-800 rounded-xl text-stone-100 placeholder-stone-500 focus:outline-none focus:border-gold-500 text-sm transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-saffron-500 text-sm transition-colors"
           />
         </div>
         <Button
@@ -176,13 +194,13 @@ export const MenuManagement: React.FC = () => {
       {/* Menu items grid */}
       {loading && items.length === 0 ? (
         <div className="flex justify-center py-12">
-          <svg className="animate-spin h-8 w-8 text-gold-500" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin h-8 w-8 text-saffron-500" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="text-center py-12 text-stone-500 font-display">
+        <div className="text-center py-12 text-neutral-500 font-display">
           No menu items found.
         </div>
       ) : (
@@ -191,7 +209,7 @@ export const MenuManagement: React.FC = () => {
             <Card key={item._id} hoverable className="p-1 flex flex-col justify-between h-full">
               <div>
                 {/* Food Image */}
-                <div className="h-44 w-full rounded-t-xl bg-stone-800 overflow-hidden relative">
+                <div className="h-44 w-full rounded-t-xl bg-neutral-100 overflow-hidden relative">
                   {item.imgSrc ? (
                     <img
                       src={item.imgSrc}
@@ -200,7 +218,7 @@ export const MenuManagement: React.FC = () => {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-stone-600 font-display font-semibold">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-neutral-400 font-display font-semibold">
                       No Image
                     </div>
                   )}
@@ -214,16 +232,16 @@ export const MenuManagement: React.FC = () => {
                 {/* Details */}
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="font-display font-bold text-stone-100 text-base tracking-tight leading-tight">
+                    <h3 className="font-display font-bold text-neutral-900 text-base tracking-tight leading-tight">
                       {item.name}
                     </h3>
                   </div>
-                  <p className="text-xs text-stone-400 line-clamp-2 mt-1 leading-relaxed">
+                  <p className="text-xs text-neutral-500 line-clamp-2 mt-1 leading-relaxed">
                     {item.desc || 'No description provided.'}
                   </p>
                   {item.ingredients && (
-                    <div className="mt-3 text-[10px] text-stone-500 font-medium">
-                      <span className="font-semibold text-stone-400">Ingredients: </span>
+                    <div className="mt-3 text-[10px] text-neutral-500 font-medium">
+                      <span className="font-semibold text-neutral-400">Ingredients: </span>
                       {item.ingredients}
                     </div>
                   )}
@@ -232,20 +250,20 @@ export const MenuManagement: React.FC = () => {
 
               {/* Action buttons */}
               <div className="p-4 pt-0 flex items-center justify-between gap-3 mt-4 shrink-0">
-                <div className="flex items-center gap-1.5 bg-stone-900/50 px-2 py-1 rounded-lg border border-stone-850 text-[10px] text-stone-400 font-semibold uppercase tracking-wider">
-                  <SlidersHorizontal size={10} className="text-gold-500" />
+                <div className="flex items-center gap-1.5 bg-neutral-100 px-2 py-1 rounded-lg border border-neutral-200 text-[10px] text-neutral-500 font-semibold uppercase tracking-wider">
+                  <SlidersHorizontal size={10} className="text-saffron-500" />
                   Priority: {item.priority}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => openEditModal(item)}
-                    className="p-2 rounded-lg bg-stone-900 border border-stone-800 hover:border-gold-500 text-stone-400 hover:text-gold-500 transition-all cursor-pointer"
+                    className="p-2 rounded-lg bg-white border border-neutral-200 hover:border-saffron-500 text-neutral-500 hover:text-saffron-500 transition-all cursor-pointer"
                   >
                     <Edit2 size={14} />
                   </button>
                   <button
                     onClick={() => openDeleteModal(item)}
-                    className="p-2 rounded-lg bg-stone-900 border border-stone-800 hover:border-red-500 text-stone-400 hover:text-red-500 transition-all cursor-pointer"
+                    className="p-2 rounded-lg bg-white border border-neutral-200 hover:border-red-500 text-neutral-500 hover:text-red-500 transition-all cursor-pointer"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -323,6 +341,136 @@ export const MenuManagement: React.FC = () => {
             placeholder="Https://example.com/image.jpg"
           />
 
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Timing Template</label>
+            <select
+              value={formData.timingTemplate || ''}
+              onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
+              className="w-full px-4 py-3 glass-input rounded-xl text-sm placeholder-neutral-400 focus:ring-2 focus:ring-saffron-500/20 transition-all duration-200"
+            >
+              <option value="">No Template (Use Custom)</option>
+              {templates.map(t => (
+                <option key={t.key} value={t.key}>{t.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {!formData.timingTemplate && (
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Custom Timings</label>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Morning Start"
+                  value={formData.morningTimings?.startTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
+                  })}
+                  placeholder="08:00"
+                />
+                <Input
+                  label="Morning End"
+                  value={formData.morningTimings?.endTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
+                  })}
+                  placeholder="11:30"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Evening Start"
+                  value={formData.eveningTimings?.startTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
+                  })}
+                  placeholder="16:00"
+                />
+                <Input
+                  label="Evening End"
+                  value={formData.eveningTimings?.endTime || ''}
+                  onChange={(e) => setFormData({
+                    ...formData,
+                    eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
+                  })}
+                  placeholder="22:30"
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Allergens</label>
+            <div className="flex flex-wrap gap-3">
+              {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => (
+                <label key={allergen} className="flex items-center gap-2 text-sm text-neutral-600">
+                  <input
+                    type="checkbox"
+                    checked={formData.allergens?.includes(allergen) || false}
+                    onChange={(e) => {
+                      const current = formData.allergens || [];
+                      const updated = e.target.checked
+                        ? [...current, allergen]
+                        : current.filter(a => a !== allergen);
+                      setFormData({ ...formData, allergens: updated });
+                    }}
+                    className="rounded text-saffron-500 focus:ring-saffron-500"
+                  />
+                  {allergen}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Dietary Labels</label>
+            <div className="flex flex-wrap gap-3">
+              {['Vegan', 'Jain', 'Gluten-Free', 'Halal'].map(label => (
+                <label key={label} className="flex items-center gap-2 text-sm text-neutral-600">
+                  <input
+                    type="checkbox"
+                    checked={formData.dietaryLabels?.includes(label) || false}
+                    onChange={(e) => {
+                      const current = formData.dietaryLabels || [];
+                      const updated = e.target.checked
+                        ? [...current, label]
+                        : current.filter(l => l !== label);
+                      setFormData({ ...formData, dietaryLabels: updated });
+                    }}
+                    className="rounded text-saffron-500 focus:ring-saffron-500"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Specials</label>
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 text-sm text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={formData.morningSpecial || false}
+                  onChange={(e) => setFormData({ ...formData, morningSpecial: e.target.checked })}
+                  className="rounded text-saffron-500 focus:ring-saffron-500"
+                />
+                Morning Special
+              </label>
+              <label className="flex items-center gap-2 text-sm text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={formData.eveningSpecial || false}
+                  onChange={(e) => setFormData({ ...formData, eveningSpecial: e.target.checked })}
+                  className="rounded text-saffron-500 focus:ring-saffron-500"
+                />
+                Evening Special
+              </label>
+            </div>
+          </div>
+
           <div className="flex items-center gap-3 pt-4 shrink-0">
             <Button
               className="flex-1"
@@ -353,8 +501,8 @@ export const MenuManagement: React.FC = () => {
         title="Delete Menu Item"
       >
         <div className="space-y-4">
-          <p className="text-sm text-stone-300 font-display font-medium">
-            Are you sure you want to delete <span className="font-extrabold text-gold-500">"{selectedItem?.name}"</span>? This action is permanent and cannot be undone.
+          <p className="text-sm text-neutral-700 font-display font-medium">
+            Are you sure you want to delete <span className="font-extrabold text-saffron-500">"{selectedItem?.name}"</span>? This action is permanent and cannot be undone.
           </p>
 
           <div className="flex items-center gap-3 pt-4">

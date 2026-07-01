@@ -76,10 +76,10 @@ export const AddUser: React.FC = () => {
     <div className="max-w-xl mx-auto animate-fade-in space-y-6">
       
       <div className="text-center md:text-left">
-        <h1 className="font-display font-black text-2xl text-stone-100 mb-1">
+        <h1 className="font-display font-black text-2xl text-neutral-900 mb-1">
           User Management
         </h1>
-        <p className="text-sm text-stone-400 font-medium">
+        <p className="text-sm text-neutral-500 font-medium">
           Create new administrative or staff accounts for the system
         </p>
       </div>
@@ -149,18 +149,18 @@ export const AddUser: React.FC = () => {
 
             {/* Role Dropdown */}
             <div className="flex flex-col gap-1.5 w-full">
-              <label className="text-xs font-semibold text-stone-300 font-display tracking-wide uppercase">
+              <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">
                 System Role *
               </label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as any)}
                 disabled={loading}
-                className="w-full px-4 py-3 glass-input rounded-xl text-sm bg-stone-900 border border-stone-800 text-stone-200 focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 focus:outline-none transition-all cursor-pointer"
+                className="w-full px-4 py-3 glass-input rounded-xl text-sm bg-white border border-neutral-200 text-neutral-900 focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 focus:outline-none transition-all cursor-pointer"
               >
-                <option value="user" className="bg-stone-950">User (Standard)</option>
-                <option value="staff" className="bg-stone-950">Staff (Chef / Crew)</option>
-                <option value="admin" className="bg-stone-950">Admin (Owner)</option>
+                <option value="user" className="bg-white">User (Standard)</option>
+                <option value="staff" className="bg-white">Staff (Chef / Crew)</option>
+                <option value="admin" className="bg-white">Admin (Owner)</option>
               </select>
             </div>
 

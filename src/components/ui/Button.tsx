@@ -15,13 +15,13 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   ...props
 }) => {
-  const baseStyle = 'inline-flex items-center justify-center font-display font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gold-500/50 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
+  const baseStyle = 'inline-flex items-center justify-center font-display font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-saffron-500/50 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 cursor-pointer';
   
   const variants = {
-    primary: 'bg-gold-500 hover:bg-gold-400 text-stone-950 shadow-[0_4px_20px_rgba(244,196,48,0.25)] hover:shadow-[0_4px_24px_rgba(244,196,48,0.4)]',
-    secondary: 'bg-stone-800 hover:bg-stone-700 text-stone-100 border border-stone-700',
-    outline: 'border border-gold-500/50 hover:border-gold-500 bg-transparent text-gold-500 hover:bg-gold-500/5',
-    ghost: 'bg-transparent hover:bg-stone-800 text-stone-300 hover:text-stone-100',
+    primary: 'bg-saffron-500 hover:bg-saffron-400 text-white shadow-[0_4px_20px_rgba(255,149,0,0.25)] hover:shadow-[0_4px_24px_rgba(255,149,0,0.4)]',
+    secondary: 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900 border border-neutral-200',
+    outline: 'border border-saffron-500/50 hover:border-saffron-500 bg-transparent text-saffron-600 hover:bg-saffron-500/5',
+    ghost: 'bg-transparent hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900',
     danger: 'bg-red-600 hover:bg-red-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.25)]',
   };
 

@@ -2,47 +2,19 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-display: "Outfit", sans-serif;
 
-  --color-gold-50: #fff9ed;
-  --color-gold-100: #fff3d6;
-  --color-gold-200: #ffe5ad;
-  --color-gold-300: #ffd179;
-  --color-gold-400: #ffb43d;
-  --color-gold-500: #ff9500; /* PRIMARY - Saffron Gold */
-  --color-gold-600: #f57c00;
-  --color-gold-700: #e65100;
-  --color-gold-800: #bf360c;
-  --color-gold-900: #8d2a0a;
-  
-  --color-stone-50: #fdfcfb;
-  --color-stone-100: #faf8f5;
-  --color-stone-200: #f5f1eb;
-  --color-stone-300: #e8e2d8;
-  --color-stone-400: #d4c9b8;
-  --color-stone-500: #b8a890;
-  --color-stone-600: #9a8a72;
-  --color-stone-700: #7a6d5a;
-  --color-stone-800: #5a5045;
-  --color-stone-900: #3d3630;
-  --color-stone-950: #2a241f;
-
-  --color-green-50: #f0fdf4;
-  --color-green-100: #dcfce7;
-  --color-green-200: #bbf7d0;
-  --color-green-300: #86efac;
-  --color-green-400: #4ade80;
-  --color-green-500: #22c55e;
-  --color-green-600: #16a34a;
-  --color-green-700: #15803d;
-  --color-green-800: #166534;
-  --color-green-900: #14532d;
-  --color-green-950: #052e16;
-  
-  --color-veg-green: #16a34a;
-  --color-veg-bg: #f0fdf4;
-  --color-veg-border: #bbf7d0;
+  --color-saffron-50: #fff9ed;
+  --color-saffron-100: #fff3d6;
+  --color-saffron-200: #ffe5ad;
+  --color-saffron-300: #ffd179;
+  --color-saffron-400: #ffb43d;
+  --color-saffron-500: #ff9500; /* PRIMARY - Saffron Gold */
+  --color-saffron-600: #f57c00;
+  --color-saffron-700: #e65100;
+  --color-saffron-800: #bf360c;
+  --color-saffron-900: #8d2a0a;
 
   --animate-fade-in: fade-in 0.25s ease-out;
   --animate-slide-up: slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -60,16 +32,24 @@
 }
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
-body {
+html, body {
   margin: 0;
-  background-color: var(--color-stone-950);
-  color: var(--color-stone-100);
+  height: 100%;
+  overflow: hidden;
+  background-color: #fdfcfb;
+  color: #171717;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Custom scrollbars */
@@ -79,47 +59,41 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-stone-900);
+  background: #f5f5f5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-stone-700);
+  background: #d4d4d4;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-stone-500);
+  background: #a3a3a3;
 }
 
 /* Glassmorphism utilities */
 .glass-panel {
-  background: rgba(42, 36, 31, 0.65); /* neutral-950 / 65% */
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(184, 168, 144, 0.15); /* neutral-500 / 15% */
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .glass-panel-hover:hover {
-  background: rgba(61, 54, 48, 0.75); /* neutral-900 / 75% */
-  border-color: rgba(255, 149, 0, 0.35); /* saffron-500 / 35% */
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 149, 0, 0.35); /* saffron-500 */
 }
 
 .glass-input {
-  background: rgba(42, 36, 31, 0.5); /* neutral-950 / 50% */
-  border: 1px solid rgba(184, 168, 144, 0.2);
-  color: var(--color-stone-100);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #171717;
   transition: all 0.2s ease-in-out;
 }
 
 .glass-input:focus {
-  border-color: var(--color-gold-500);
+  border-color: var(--color-saffron-500);
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 149, 0, 0.2);
-}
-
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
 /* Safe Area Utility Classes for PWA / Mobile */
@@ -133,7 +107,7 @@ body {
   height: calc(4rem + env(safe-area-inset-top, 0px));
 }
 .h-nav-safe {
-  height: calc(5rem + env(safe-area-inset-bottom, 0px)); /* Height 5rem to give icons slightly more breathing room */
+  height: calc(5rem + env(safe-area-inset-bottom, 0px));
 }
 .pb-content-safe {
   padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));

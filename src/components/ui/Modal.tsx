@@ -41,12 +41,12 @@ export const Modal: React.FC<ModalProps> = ({
       
       {/* Modal Container */}
       <Card
-        className={`relative w-full max-w-lg shadow-2xl z-10 animate-slide-up border border-stone-800/80 max-h-[85vh] flex flex-col ${className}`}
+        className={`relative w-full max-w-lg shadow-2xl z-10 animate-slide-up border border-neutral-200 max-h-[85vh] flex flex-col ${className}`}
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-5 py-4 shrink-0">
           {title ? (
-            <h3 className="font-display text-lg font-bold text-stone-100 tracking-tight">
+            <h3 className="font-display text-lg font-bold text-neutral-900 tracking-tight">
               {title}
             </h3>
           ) : (
@@ -54,7 +54,7 @@ export const Modal: React.FC<ModalProps> = ({
           )}
           <button
             onClick={onDismiss}
-            className="p-1.5 rounded-lg hover:bg-stone-800 text-stone-400 hover:text-stone-100 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg hover:bg-neutral-100 text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
