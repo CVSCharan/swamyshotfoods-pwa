@@ -249,21 +249,19 @@ export const ShopStatus: React.FC = () => {
             </Button>
           </div>
         </CardHeader>
-        {config.ownerAvatarUrl && (
-          <CardContent className="flex justify-center pt-4">
-            <div className="relative group">
-              <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-saffron-500 shadow-xl bg-white">
-                <img src={config.ownerAvatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-              </div>
-              <button
-                onClick={triggerFileSelect}
-                className="absolute inset-0 bg-neutral-900/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
-              >
-                <Camera size={18} className="text-white" />
-              </button>
+        <CardContent className="flex justify-center pt-4">
+          <div className="relative group">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-saffron-500 shadow-xl bg-white flex items-center justify-center">
+              <img src={config.ownerAvatarUrl || '/logo.png'} alt="Avatar" className={`w-full h-full ${config.ownerAvatarUrl ? 'object-cover' : 'object-contain p-2'}`} />
             </div>
-          </CardContent>
-        )}
+            <button
+              onClick={triggerFileSelect}
+              className="absolute inset-0 bg-neutral-900/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 cursor-pointer"
+            >
+              <Camera size={18} className="text-white" />
+            </button>
+          </div>
+        </CardContent>
       </Card>
 
       {/* Notice Board */}
