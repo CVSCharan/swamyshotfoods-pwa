@@ -59,6 +59,15 @@ export const useStoreConfigSSE = () => {
         try {
           if (event.data) {
             const data = JSON.parse(event.data);
+            
+            // Deduplication: Ignore broadcasts if we already have this exact state.
+            // This prevents the PWA from re-rendering if it was the one who initiated the PUT request.
+            const currentConfig = useStoreConfigStore.getState().config;
+            if (currentConfig && currentConfig.updatedAt === data.updatedAt) {
+              console.log('🔄 SSE Data received but ignored (already in sync based on updatedAt)');
+              return;
+            }
+
             console.log('📦 SSE Data received:', data);
             setConfig(data);
           }
