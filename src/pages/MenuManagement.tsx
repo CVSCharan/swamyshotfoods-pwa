@@ -404,46 +404,56 @@ export const MenuManagement: React.FC = () => {
           <div className="space-y-2">
             <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Allergens</label>
             <div className="flex flex-wrap gap-3">
-              {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => (
-                <label key={allergen} className="flex items-center gap-2 text-sm text-neutral-600">
-                  <input
-                    type="checkbox"
-                    checked={formData.allergens?.includes(allergen) || false}
-                    onChange={(e) => {
-                      const current = formData.allergens || [];
-                      const updated = e.target.checked
-                        ? [...current, allergen]
-                        : current.filter(a => a !== allergen);
-                      setFormData({ ...formData, allergens: updated });
-                    }}
-                    className="rounded text-saffron-500 focus:ring-saffron-500"
-                  />
-                  {allergen}
-                </label>
-              ))}
+              {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => {
+                const lowerAllergen = allergen.toLowerCase();
+                const isChecked = formData.allergens?.map(a => a.toLowerCase()).includes(lowerAllergen) || false;
+                
+                return (
+                  <label key={allergen} className="flex items-center gap-2 text-sm text-neutral-600">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const current = formData.allergens?.map(a => a.toLowerCase()) || [];
+                        const updated = e.target.checked
+                          ? [...current, lowerAllergen]
+                          : current.filter(a => a !== lowerAllergen);
+                        setFormData({ ...formData, allergens: updated });
+                      }}
+                      className="rounded text-saffron-500 focus:ring-saffron-500"
+                    />
+                    {allergen}
+                  </label>
+                );
+              })}
             </div>
           </div>
 
           <div className="space-y-2">
             <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Dietary Labels</label>
             <div className="flex flex-wrap gap-3">
-              {['Vegan', 'Jain', 'Gluten-Free'].map(label => (
-                <label key={label} className="flex items-center gap-2 text-sm text-neutral-600">
-                  <input
-                    type="checkbox"
-                    checked={formData.dietaryLabels?.includes(label) || false}
-                    onChange={(e) => {
-                      const current = formData.dietaryLabels || [];
-                      const updated = e.target.checked
-                        ? [...current, label]
-                        : current.filter(l => l !== label);
-                      setFormData({ ...formData, dietaryLabels: updated });
-                    }}
-                    className="rounded text-saffron-500 focus:ring-saffron-500"
-                  />
-                  {label}
-                </label>
-              ))}
+              {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => {
+                const lowerLabel = label.toLowerCase();
+                const isChecked = formData.dietaryLabels?.map(l => l.toLowerCase()).includes(lowerLabel) || false;
+
+                return (
+                  <label key={label} className="flex items-center gap-2 text-sm text-neutral-600">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const current = formData.dietaryLabels?.map(l => l.toLowerCase()) || [];
+                        const updated = e.target.checked
+                          ? [...current, lowerLabel]
+                          : current.filter(l => l !== lowerLabel);
+                        setFormData({ ...formData, dietaryLabels: updated });
+                      }}
+                      className="rounded text-saffron-500 focus:ring-saffron-500"
+                    />
+                    {label}
+                  </label>
+                );
+              })}
             </div>
           </div>
 
