@@ -40,9 +40,9 @@ export const ShopStatus: React.FC = () => {
   const updateConfig = async (updates: Partial<StoreConfig>) => {
     setLoading(true);
     try {
-      await storeConfigService.update(updates);
-      if (config) {
-        setConfig({ ...config, ...updates });
+      const updatedConfig = await storeConfigService.update(updates);
+      if (updatedConfig) {
+        setConfig(updatedConfig);
       }
       showNotification('Store status updated successfully!');
     } catch (err) {
