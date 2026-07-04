@@ -15,11 +15,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { isConnected } = useStoreConfigStore();
 
   const handleLogoutClick = () => {
-    if (confirm('Are you sure you want to log out?')) {
-      logout().then(() => {
-        navigate('/login');
-      });
-    }
+    logout().then(() => {
+      navigate('/login');
+    });
   };
 
   const navItems = [
