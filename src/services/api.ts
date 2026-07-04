@@ -78,7 +78,10 @@ class ApiClient {
     const headers = this.getAuthHeaders();
 
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`, { headers });
+      const response = await fetch(`${this.baseUrl}${endpoint}`, { 
+        headers,
+        cache: 'no-store'
+      });
       console.log(`✅ GET ${endpoint} - Status: ${response.status}`);
       return this.handleResponse<T>(response);
     } catch (error) {
