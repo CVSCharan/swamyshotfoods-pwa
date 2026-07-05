@@ -74,6 +74,11 @@ Here is the progress checklist corresponding to the current system audit and pro
 - [x] **Admin PWA SW Update Polling**: Configured `virtual:pwa-register` in the Admin panel to check for Service Worker updates periodically and on tab visibility change, preventing admins from being stuck on an outdated cache.
 - [x] **Timezone Agnostic Timing Processing**: Updated `MenuService` availability resolution to explicitly calculate times against IST (`Asia/Kolkata`) rather than server local time.
 
+### 🎨 7. UI Enhancements & Custom Flags
+- [x] **Store Config Additions**: Added `menuHeaderMessage` to `StoreConfig` to allow custom messages at the top of the customer menu.
+- [x] **Menu Flags**: Added `dosaSpecial` flag and badges across API, Admin PWA, and Customer Web App to highlight special dosa items.
+- [x] **Responsive Footer**: Fixed the white gap issue at the bottom of the Customer Web App by implementing `env(safe-area-inset-bottom)` on the footer.
+
 ---
 
 *Last Updated: July 2026*
