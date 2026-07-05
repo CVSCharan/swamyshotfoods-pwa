@@ -19,6 +19,7 @@ export interface MenuItem {
   dietaryLabels?: string[];
   morningSpecial?: boolean;
   eveningSpecial?: boolean;
+  dosaSpecial?: boolean;
   priority: number;
   imgSrc: string;
 }
