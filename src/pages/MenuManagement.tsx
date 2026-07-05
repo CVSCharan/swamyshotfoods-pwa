@@ -152,6 +152,7 @@ export const MenuManagement: React.FC = () => {
       dietaryLabels: [],
       morningSpecial: false,
       eveningSpecial: false,
+      dosaSpecial: false,
       morningTimings: null,
       eveningTimings: null,
     });
@@ -245,6 +246,9 @@ export const MenuManagement: React.FC = () => {
                     )}
                     {item.eveningSpecial && (
                       <Badge variant="primary" className="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5">🌙 Evening Special</Badge>
+                    )}
+                    {item.dosaSpecial && (
+                      <Badge variant="secondary" className="bg-rose-100 text-rose-700 text-[9px] px-1.5 py-0.5">🥞 Dosa Special</Badge>
                     )}
                     {item.timingTemplate ? (
                       <Badge variant="neutral" className="bg-neutral-100 text-neutral-600 text-[9px] px-1.5 py-0.5">🕒 Template: {item.timingTemplate}</Badge>
@@ -520,6 +524,15 @@ export const MenuManagement: React.FC = () => {
                   className="rounded text-saffron-500 focus:ring-saffron-500"
                 />
                 Evening Special
+              </label>
+              <label className="flex items-center gap-2 text-sm text-neutral-600">
+                <input
+                  type="checkbox"
+                  checked={formData.dosaSpecial || false}
+                  onChange={(e) => setFormData({ ...formData, dosaSpecial: e.target.checked })}
+                  className="rounded text-saffron-500 focus:ring-saffron-500"
+                />
+                Dosa Special
               </label>
             </div>
           </div>

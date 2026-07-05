@@ -27,3 +27,7 @@ This repository (`swamyshotfoods-pwa`) acts as the Admin Dashboard. It is a Prog
 ## Context Retrieval for AI Assistants
 - **Routing**: Client-side routing with React Router. Protected routes require active auth.
 - **State Updates**: When modifying `ShopStatus.tsx`, ensure any UI state accurately reflects the `config` object from the Zustand store. Do not decouple local React state from the global store unless strictly necessary for form inputs.
+
+### Mobile Caching & Lifecycle Optimization
+- **Page Visibility API (`document.hidden`)**: Implemented in SSE hooks (`useStoreConfigSSE`) to automatically pause and resume network requests when the app enters or leaves the background. This guarantees data freshness when an admin re-opens the app.
+- **Vite PWA Service Worker Auto-Update**: Integrated `virtual:pwa-register` in `main.tsx` with a polling interval. The app periodically checks the server for new Service Worker versions and automatically triggers an update to clear aggressive mobile caching and load the newest assets.

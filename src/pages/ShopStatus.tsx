@@ -18,6 +18,7 @@ export const ShopStatus: React.FC = () => {
   const [noticeText, setNoticeText] = useState('');
   const [holidayText, setHolidayText] = useState('');
   const [shopDesc, setShopDesc] = useState('');
+  const [menuHeaderText, setMenuHeaderText] = useState('');
   const [menuFooterText, setMenuFooterText] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
@@ -28,6 +29,7 @@ export const ShopStatus: React.FC = () => {
       setNoticeText(config.noticeMessage || '');
       setHolidayText(config.holidayMessage || '');
       setShopDesc(config.description || '');
+      setMenuHeaderText(config.menuHeaderMessage || '');
       setMenuFooterText(config.menuFooterMessage || '');
     }
   }, [config]);
@@ -355,6 +357,31 @@ export const ShopStatus: React.FC = () => {
             loading={loading}
           >
             Save Description
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Menu Header Message */}
+      <Card className="p-1">
+        <CardHeader>
+          <CardTitle>Menu Header Message</CardTitle>
+          <CardDescription>Information shown at the top of the public menu</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input
+            multiline
+            numberOfLines={3}
+            value={menuHeaderText}
+            onChange={(e) => setMenuHeaderText(e.target.value)}
+            placeholder="Special offers, timings announcement, etc..."
+            disabled={loading}
+          />
+          <Button
+            size="sm"
+            onClick={() => updateConfig({ menuHeaderMessage: menuHeaderText })}
+            loading={loading}
+          >
+            Save Header Message
           </Button>
         </CardContent>
       </Card>
