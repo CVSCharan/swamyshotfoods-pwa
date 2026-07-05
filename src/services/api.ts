@@ -36,7 +36,7 @@ class ApiClient {
       if (response.url.includes('/auth/login') || response.url.includes('/auth/register')) {
         const errorData = await response.json().catch(() => ({}));
         throw new ApiError(
-          errorData.message || 'Invalid credentials',
+          errorData.error || errorData.message || 'Invalid credentials',
           401,
           errorData,
         );
@@ -60,7 +60,7 @@ class ApiClient {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new ApiError(
-        errorData.message || `API Error: ${response.statusText}`,
+        errorData.error || errorData.message || `API Error: ${response.statusText}`,
         response.status,
         errorData,
       );

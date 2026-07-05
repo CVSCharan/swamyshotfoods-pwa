@@ -12,6 +12,7 @@ export interface StoreConfig {
   menuFooterMessage?: string;
   ownerAvatarUrl?: string;
   cookingImageUrl?: string;
+  updatedAt: string;
 }
 
 interface StoreConfigStore {

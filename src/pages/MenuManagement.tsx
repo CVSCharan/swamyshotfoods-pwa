@@ -96,6 +96,7 @@ export const MenuManagement: React.FC = () => {
     if (!selectedItem || !validateForm()) return;
 
     setLoading(true);
+    console.log("Submitting formData:", formData);
     try {
       await menuService.update(selectedItem._id, formData);
       updateItem(selectedItem._id, formData);
@@ -236,6 +237,26 @@ export const MenuManagement: React.FC = () => {
                       {item.name}
                     </h3>
                   </div>
+                  
+                  {/* Tags / Badges */}
+                  <div className="flex flex-wrap gap-1.5 mt-2 mb-2">
+                    {item.morningSpecial && (
+                      <Badge variant="warning" className="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5">☀️ Morning Special</Badge>
+                    )}
+                    {item.eveningSpecial && (
+                      <Badge variant="primary" className="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5">🌙 Evening Special</Badge>
+                    )}
+                    {item.timingTemplate ? (
+                      <Badge variant="neutral" className="bg-neutral-100 text-neutral-600 text-[9px] px-1.5 py-0.5">🕒 Template: {item.timingTemplate}</Badge>
+                    ) : (item.morningTimings || item.eveningTimings) ? (
+                      <Badge variant="neutral" className="bg-neutral-100 text-neutral-600 text-[9px] px-1.5 py-0.5">
+                        🕒 {item.morningTimings ? `${item.morningTimings.startTime}-${item.morningTimings.endTime}` : ''} 
+                        {item.morningTimings && item.eveningTimings ? ' & ' : ''}
+                        {item.eveningTimings ? `${item.eveningTimings.startTime}-${item.eveningTimings.endTime}` : ''}
+                      </Badge>
+                    ) : null}
+                  </div>
+
                   <p className="text-xs text-neutral-500 line-clamp-2 mt-1 leading-relaxed">
                     {item.desc || 'No description provided.'}
                   </p>
@@ -354,6 +375,28 @@ export const MenuManagement: React.FC = () => {
               ))}
             </select>
           </div>
+
+          {formData.timingTemplate && (
+            <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200 text-xs text-neutral-600 space-y-1">
+              <p className="font-semibold text-neutral-800 font-display uppercase tracking-wide mb-2">Template Timings</p>
+              {(() => {
+                const t = templates.find(temp => temp.key === formData.timingTemplate);
+                if (!t) return <p>Loading...</p>;
+                return (
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <span className="font-semibold block text-neutral-500">Morning</span>
+                      <span>{t.morningTimings?.startTime || 'N/A'} - {t.morningTimings?.endTime || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold block text-neutral-500">Evening</span>
+                      <span>{t.eveningTimings?.startTime || 'N/A'} - {t.eveningTimings?.endTime || 'N/A'}</span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          )}
 
           {!formData.timingTemplate && (
             <div className="space-y-3">
