@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success';
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' | 'primary' | 'neutral';
 }
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -18,6 +18,9 @@ export const Badge: React.FC<BadgeProps> = ({
     destructive: 'bg-red-500/10 text-red-600 border border-red-500/25',
     outline: 'border border-neutral-300 text-neutral-500 bg-transparent',
     success: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/25',
+    warning: 'bg-amber-500/10 text-amber-600 border border-amber-500/25',
+    primary: 'bg-blue-500/10 text-blue-600 border border-blue-500/25',
+    neutral: 'bg-neutral-100 text-neutral-600 border border-neutral-200',
   };
 
   return (
