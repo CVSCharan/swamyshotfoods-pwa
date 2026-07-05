@@ -63,6 +63,17 @@ Here is the progress checklist corresponding to the current system audit and pro
 - [x] **Global Store Status Hook**: Relocate `useStoreConfigSSE()` connection from `page.tsx` to the global `Header` component.
 - [x] **Fix Deep Link Inconsistencies**: Ensure direct refreshes on pages like `/menu` load the dynamic store configuration, notice board, and menu footer message.
 
+### 🛡️ 5. Ecosystem Stabilization & SSE Battery Optimization
+- [x] **Unified API Error Responses**: Enforced standard `{ error, message }` JSON responses through global error middleware, preventing client crashes.
+- [x] **PWA Caching & Error Interception**: Updated `api.ts` to properly consume unified error responses and patched `VitePWA` Service Worker typings (`updatedAt` fixed in `StoreConfig`).
+- [x] **Mobile Battery Optimization via Visibility API**: Integrated Page Visibility (`document.hidden`) checks into both the PWA and Web App SSE hooks. Connections now automatically pause when the tab/app goes to the background and resume upon return, completely eliminating endless reconnection loops and severe battery drain on mobile devices.
+- [x] **Mongoose `$set` Integrity**: Verified all controllers properly use MongoDB `$set` for partial updates to avoid overwriting data objects.
+
+### 📱 6. Mobile & PWA Optimization
+- [x] **Web App Stale Menu Fix**: Refactored `useMenuItems.ts` to re-fetch menu data on `document.visibilitychange` to prevent mobile users from seeing stale menus when resuming from the background.
+- [x] **Admin PWA SW Update Polling**: Configured `virtual:pwa-register` in the Admin panel to check for Service Worker updates periodically and on tab visibility change, preventing admins from being stuck on an outdated cache.
+- [x] **Timezone Agnostic Timing Processing**: Updated `MenuService` availability resolution to explicitly calculate times against IST (`Asia/Kolkata`) rather than server local time.
+
 ---
 
 *Last Updated: July 2026*
