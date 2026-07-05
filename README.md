@@ -68,3 +68,11 @@ Under the hood, real-time sync is managed by the `useStoreConfigSSE` hook. To en
 
 ### Authentication Response Interceptors
 The global client interceptor in `api.ts` filters out authentication requests (like `/auth/login`) from general `401 Unauthorized` handling. This allows invalid credentials to throw validation errors back to the login page (displaying "Invalid credentials" in the UI) rather than falsely triggering a "session has expired" alert-reload loop.
+
+---
+
+## 📅 Recent Updates (July 2026)
+
+*   **UI Enhancements**: Added distinctive badges (☀️ Morning Special, 🌙 Evening Special, 🕒 Timings) directly on Menu Management cards to visually confirm configuration state in the dashboard.
+*   **Battery Optimization**: Integrated Page Visibility APIs (`document.hidden`) to automatically pause the SSE connection when the app is backgrounded on mobile devices, saving battery and data.
+*   **Service Worker Polling**: Configured `virtual:pwa-register` to check for updates periodically and upon tab visibility changes, ensuring the Admin portal is always up-to-date.
