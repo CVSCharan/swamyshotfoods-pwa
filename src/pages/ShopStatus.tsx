@@ -59,8 +59,8 @@ export const ShopStatus: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('File is too large. Max size is 2MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File is too large. Max size is 10MB.');
       return;
     }
 
@@ -80,8 +80,8 @@ export const ShopStatus: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 2 * 1024 * 1024) {
-      alert('File is too large. Max size is 2MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File is too large. Max size is 10MB.');
       return;
     }
 
