@@ -309,249 +309,287 @@ export const MenuManagement: React.FC = () => {
         }}
         title={`${isEditModalVisible ? 'Edit' : 'Add'} Menu Item`}
       >
-        <div className="space-y-4">
-          <Input
-            label="Name *"
-            value={formData.name || ''}
-            onChange={(e) => {
-              setFormData({ ...formData, name: e.target.value });
-              if (formErrors.name) setFormErrors({ ...formErrors, name: '' });
-            }}
-            error={formErrors.name}
-            placeholder="E.g. Butter Roti"
-          />
+        <div className="space-y-6 max-h-[75vh] overflow-y-auto px-1 scrollbar-hide pb-4">
+          
+          {/* Section 1: Basic Information */}
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
+            <h4 className="text-sm font-bold text-neutral-800 font-display border-b border-neutral-100 pb-2 mb-3">
+              Basic Details
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Name *"
+                value={formData.name || ''}
+                onChange={(e) => {
+                  setFormData({ ...formData, name: e.target.value });
+                  if (formErrors.name) setFormErrors({ ...formErrors, name: '' });
+                }}
+                error={formErrors.name}
+                placeholder="E.g. Butter Roti"
+              />
+              <Input
+                label="Price (₹) *"
+                type="number"
+                value={formData.price !== undefined ? formData.price : ''}
+                onChange={(e) => {
+                  setFormData({ ...formData, price: parseFloat(e.target.value) || 0 });
+                  if (formErrors.price) setFormErrors({ ...formErrors, price: '' });
+                }}
+                error={formErrors.price}
+                placeholder="E.g. 40"
+              />
+            </div>
+            
+            <Input
+              label="Description"
+              multiline
+              numberOfLines={2}
+              value={formData.desc || ''}
+              onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
+              placeholder="Brief item details..."
+            />
 
-          <Input
-            label="Price (₹) *"
-            type="number"
-            value={formData.price !== undefined ? formData.price : ''}
-            onChange={(e) => {
-              setFormData({ ...formData, price: parseFloat(e.target.value) || 0 });
-              if (formErrors.price) setFormErrors({ ...formErrors, price: '' });
-            }}
-            error={formErrors.price}
-            placeholder="E.g. 40"
-          />
+            <Input
+              label="Ingredients"
+              multiline
+              numberOfLines={2}
+              value={formData.ingredients || ''}
+              onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+              placeholder="Wheat flour, butter, etc..."
+            />
 
-          <Input
-            label="Description"
-            multiline
-            numberOfLines={3}
-            value={formData.desc || ''}
-            onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
-            placeholder="Brief item details..."
-          />
-
-          <Input
-            label="Ingredients"
-            multiline
-            numberOfLines={2}
-            value={formData.ingredients || ''}
-            onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
-            placeholder="Wheat flour, butter, etc..."
-          />
-
-          <Input
-            label="Priority (Order)"
-            type="number"
-            value={formData.priority !== undefined ? formData.priority : ''}
-            onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })}
-            placeholder="1, 2, 3..."
-          />
-
-          <Input
-            label="Image URL"
-            value={formData.imgSrc || ''}
-            onChange={(e) => setFormData({ ...formData, imgSrc: e.target.value })}
-            placeholder="Https://example.com/image.jpg"
-          />
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Timing Template</label>
-            <select
-              value={formData.timingTemplate || ''}
-              onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
-              className="w-full px-4 py-3 glass-input rounded-xl text-sm placeholder-neutral-400 focus:ring-2 focus:ring-saffron-500/20 transition-all duration-200"
-            >
-              <option value="">No Template (Use Custom)</option>
-              {templates.map(t => (
-                <option key={t.key} value={t.key}>{t.name}</option>
-              ))}
-            </select>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Image URL"
+                value={formData.imgSrc || ''}
+                onChange={(e) => setFormData({ ...formData, imgSrc: e.target.value })}
+                placeholder="https://example.com/image.jpg"
+              />
+              <Input
+                label="Priority (Display Order)"
+                type="number"
+                value={formData.priority !== undefined ? formData.priority : ''}
+                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })}
+                placeholder="1 = Highest"
+              />
+            </div>
           </div>
 
-          {formData.timingTemplate && (
-            <div className="bg-neutral-50 p-3 rounded-lg border border-neutral-200 text-xs text-neutral-600 space-y-1">
-              <p className="font-semibold text-neutral-800 font-display uppercase tracking-wide mb-2">Template Timings</p>
-              {(() => {
-                const t = templates.find(temp => temp.key === formData.timingTemplate);
-                if (!t) return <p>Loading...</p>;
-                return (
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <span className="font-semibold block text-neutral-500">Morning</span>
-                      <span>{t.morningTimings?.startTime || 'N/A'} - {t.morningTimings?.endTime || 'N/A'}</span>
+          {/* Section 2: Timings */}
+          <div className="bg-neutral-50/50 p-4 sm:p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
+            <h4 className="text-sm font-bold text-neutral-800 font-display border-b border-neutral-100 pb-2 mb-3">
+              Availability & Timings
+            </h4>
+            
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-neutral-600 tracking-wide uppercase">Timing Template</label>
+              <select
+                value={formData.timingTemplate || ''}
+                onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
+                className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-700 shadow-sm focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all outline-none"
+              >
+                <option value="">Use Custom Timings</option>
+                {templates.map(t => (
+                  <option key={t.key} value={t.key}>{t.name}</option>
+                ))}
+              </select>
+            </div>
+
+            {formData.timingTemplate && (
+              <div className="bg-white p-4 rounded-xl border border-saffron-100 shadow-inner">
+                {(() => {
+                  const t = templates.find(temp => temp.key === formData.timingTemplate);
+                  if (!t) return <p className="text-xs text-neutral-500">Loading...</p>;
+                  return (
+                    <div className="flex flex-col sm:flex-row gap-6">
+                      <div className="flex-1">
+                        <span className="text-[10px] font-bold text-saffron-600 uppercase tracking-wider block mb-1">Morning Session</span>
+                        <span className="text-sm font-medium text-neutral-700">{t.morningTimings?.startTime || 'Closed'} - {t.morningTimings?.endTime || 'Closed'}</span>
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block mb-1">Evening Session</span>
+                        <span className="text-sm font-medium text-neutral-700">{t.eveningTimings?.startTime || 'Closed'} - {t.eveningTimings?.endTime || 'Closed'}</span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-semibold block text-neutral-500">Evening</span>
-                      <span>{t.eveningTimings?.startTime || 'N/A'} - {t.eveningTimings?.endTime || 'N/A'}</span>
-                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
+            {!formData.timingTemplate && (
+              <div className="space-y-4 pt-2">
+                <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
+                  <span className="text-[10px] font-bold text-saffron-600 uppercase tracking-wider block mb-3">Morning Session</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      type="time"
+                      label="Start Time"
+                      value={formData.morningTimings?.startTime || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
+                      })}
+                    />
+                    <Input
+                      type="time"
+                      label="End Time"
+                      value={formData.morningTimings?.endTime || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
+                      })}
+                    />
                   </div>
-                );
-              })()}
-            </div>
-          )}
-
-          {!formData.timingTemplate && (
-            <div className="space-y-3">
-              <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Custom Timings</label>
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  type="time"
-                  label="Morning Start"
-                  value={formData.morningTimings?.startTime || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
-                  })}
-                  placeholder="08:00"
-                />
-                <Input
-                  type="time"
-                  label="Morning End"
-                  value={formData.morningTimings?.endTime || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
-                  })}
-                  placeholder="11:30"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  type="time"
-                  label="Evening Start"
-                  value={formData.eveningTimings?.startTime || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
-                  })}
-                  placeholder="16:00"
-                />
-                <Input
-                  type="time"
-                  label="Evening End"
-                  value={formData.eveningTimings?.endTime || ''}
-                  onChange={(e) => setFormData({
-                    ...formData,
-                    eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
-                  })}
-                  placeholder="22:30"
-                />
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Allergens</label>
-            <div className="flex flex-wrap gap-3">
-              {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => {
-                const lowerAllergen = allergen.toLowerCase();
-                const isChecked = formData.allergens?.map(a => a.toLowerCase()).includes(lowerAllergen) || false;
+                </div>
                 
-                return (
-                  <label key={allergen} className="flex items-center gap-2 text-sm text-neutral-600">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) => {
+                <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
+                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block mb-3">Evening Session</span>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      type="time"
+                      label="Start Time"
+                      value={formData.eveningTimings?.startTime || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
+                      })}
+                    />
+                    <Input
+                      type="time"
+                      label="End Time"
+                      value={formData.eveningTimings?.endTime || ''}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
+                      })}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Section 3: Attributes (Pill Toggles) */}
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-5">
+            <h4 className="text-sm font-bold text-neutral-800 font-display border-b border-neutral-100 pb-2">
+              Item Attributes
+            </h4>
+
+            {/* Allergens */}
+            <div className="space-y-2.5">
+              <label className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">Allergens</label>
+              <div className="flex flex-wrap gap-2">
+                {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => {
+                  const lowerAllergen = allergen.toLowerCase();
+                  const isChecked = formData.allergens?.map(a => a.toLowerCase()).includes(lowerAllergen) || false;
+                  return (
+                    <button
+                      key={allergen}
+                      type="button"
+                      onClick={() => {
                         const current = formData.allergens?.map(a => a.toLowerCase()) || [];
-                        const updated = e.target.checked
-                          ? [...current, lowerAllergen]
-                          : current.filter(a => a !== lowerAllergen);
+                        const updated = isChecked
+                          ? current.filter(a => a !== lowerAllergen)
+                          : [...current, lowerAllergen];
                         setFormData({ ...formData, allergens: updated });
                       }}
-                      className="rounded text-saffron-500 focus:ring-saffron-500"
-                    />
-                    {allergen}
-                  </label>
-                );
-              })}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                        isChecked 
+                          ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm ring-1 ring-amber-500/20"
+                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                      }`}
+                    >
+                      {allergen}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Dietary Labels</label>
-            <div className="flex flex-wrap gap-3">
-              {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => {
-                const lowerLabel = label.toLowerCase();
-                const isChecked = formData.dietaryLabels?.map(l => l.toLowerCase()).includes(lowerLabel) || false;
-
-                return (
-                  <label key={label} className="flex items-center gap-2 text-sm text-neutral-600">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) => {
+            {/* Dietary Labels */}
+            <div className="space-y-2.5">
+              <label className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">Dietary Labels</label>
+              <div className="flex flex-wrap gap-2">
+                {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => {
+                  const lowerLabel = label.toLowerCase();
+                  const isChecked = formData.dietaryLabels?.map(l => l.toLowerCase()).includes(lowerLabel) || false;
+                  return (
+                    <button
+                      key={label}
+                      type="button"
+                      onClick={() => {
                         const current = formData.dietaryLabels?.map(l => l.toLowerCase()) || [];
-                        const updated = e.target.checked
-                          ? [...current, lowerLabel]
-                          : current.filter(l => l !== lowerLabel);
+                        const updated = isChecked
+                          ? current.filter(l => l !== lowerLabel)
+                          : [...current, lowerLabel];
                         setFormData({ ...formData, dietaryLabels: updated });
                       }}
-                      className="rounded text-saffron-500 focus:ring-saffron-500"
-                    />
-                    {label}
-                  </label>
-                );
-              })}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
+                        isChecked 
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm ring-1 ring-emerald-500/20"
+                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Specials */}
+            <div className="space-y-2.5">
+              <label className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">Specials & Highlights</label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, morningSpecial: !formData.morningSpecial })}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border flex items-center gap-1.5 ${
+                    formData.morningSpecial 
+                      ? "bg-sky-50 text-sky-700 border-sky-200 shadow-sm ring-1 ring-sky-500/20"
+                      : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                  }`}
+                >
+                  ☀️ Morning Special
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, eveningSpecial: !formData.eveningSpecial })}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border flex items-center gap-1.5 ${
+                    formData.eveningSpecial 
+                      ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm ring-1 ring-indigo-500/20"
+                      : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                  }`}
+                >
+                  🌙 Evening Special
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, dosaSpecial: !formData.dosaSpecial })}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border flex items-center gap-1.5 ${
+                    formData.dosaSpecial 
+                      ? "bg-rose-50 text-rose-700 border-rose-200 shadow-sm ring-1 ring-rose-500/20"
+                      : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                  }`}
+                >
+                  🥞 Dosa Special
+                </button>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Specials</label>
-            <div className="flex flex-wrap gap-4">
-              <label className="flex items-center gap-2 text-sm text-neutral-600">
-                <input
-                  type="checkbox"
-                  checked={formData.morningSpecial || false}
-                  onChange={(e) => setFormData({ ...formData, morningSpecial: e.target.checked })}
-                  className="rounded text-saffron-500 focus:ring-saffron-500"
-                />
-                Morning Special
-              </label>
-              <label className="flex items-center gap-2 text-sm text-neutral-600">
-                <input
-                  type="checkbox"
-                  checked={formData.eveningSpecial || false}
-                  onChange={(e) => setFormData({ ...formData, eveningSpecial: e.target.checked })}
-                  className="rounded text-saffron-500 focus:ring-saffron-500"
-                />
-                Evening Special
-              </label>
-              <label className="flex items-center gap-2 text-sm text-neutral-600">
-                <input
-                  type="checkbox"
-                  checked={formData.dosaSpecial || false}
-                  onChange={(e) => setFormData({ ...formData, dosaSpecial: e.target.checked })}
-                  className="rounded text-saffron-500 focus:ring-saffron-500"
-                />
-                Dosa Special
-              </label>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 pt-4 shrink-0">
+          <div className="flex items-center gap-3 pt-4 shrink-0 border-t border-neutral-100 mt-2">
             <Button
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-saffron-500 to-amber-500 shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_4px_25px_rgba(245,158,11,0.45)] hover:from-saffron-400 hover:to-amber-400"
               onClick={isEditModalVisible ? handleUpdateItem : handleAddItem}
               loading={loading}
             >
-              {isEditModalVisible ? 'Update' : 'Create'}
+              {isEditModalVisible ? 'Update Item' : 'Create Item'}
             </Button>
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 border-neutral-200 text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 hover:border-neutral-300 shadow-sm"
               onClick={() => {
                 setAddModalVisible(false);
                 setEditModalVisible(false);
@@ -578,7 +616,7 @@ export const MenuManagement: React.FC = () => {
           <div className="flex items-center gap-3 pt-4">
             <Button
               variant="danger"
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-red-500 to-rose-500 shadow-[0_4px_20px_rgba(239,68,68,0.3)]"
               onClick={handleDeleteItem}
               loading={loading}
             >
@@ -586,7 +624,7 @@ export const MenuManagement: React.FC = () => {
             </Button>
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 border-neutral-200 text-neutral-600 hover:bg-neutral-50 hover:border-neutral-300"
               onClick={() => setDeleteModalVisible(false)}
             >
               Cancel
