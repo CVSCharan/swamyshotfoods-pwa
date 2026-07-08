@@ -231,12 +231,12 @@ export const ShopStatus: React.FC = () => {
         </Card>
       )}
 
-      {/* Owner Profile Photo */}
+      {/* Shop Logo / Profile Photo */}
       <Card className="p-1">
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <CardTitle>Owner Profile Photo</CardTitle>
-            <CardDescription>Displayed on the website landing page</CardDescription>
+            <CardTitle>Shop Logo / Profile Photo</CardTitle>
+            <CardDescription>Displayed on the website landing page and splash screen</CardDescription>
           </div>
           <div>
             <input

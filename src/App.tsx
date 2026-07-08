@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/useAuthStore';
 import { useStoreConfigSSE } from './hooks/useStoreConfigSSE';
+import { useMenuSSE } from './hooks/useMenuSSE';
 
 // Layout & Pages
 import { Layout } from './components/Layout';
@@ -45,25 +46,30 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 // SSE Manager Wrapper to connect/disconnect based on Auth state and page visibility
 const SSEManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
-  const { connect, disconnect } = useStoreConfigSSE();
+  const { connect: connectStoreConfig, disconnect: disconnectStoreConfig } = useStoreConfigSSE();
+  const { connect: connectMenu, disconnect: disconnectMenu } = useMenuSSE();
 
   useEffect(() => {
     if (!isAuthenticated) {
-      disconnect();
+      disconnectStoreConfig();
+      disconnectMenu();
       return;
     }
 
     // Initial connection
-    connect();
+    connectStoreConfig();
+    connectMenu();
 
     // Battery Optimization: disconnect when tab is backgrounded, reconnect when active
     const handleVisibilityChange = () => {
       if (document.hidden) {
         console.log('🔋 Visibility: hidden - pausing SSE connection');
-        disconnect();
+        disconnectStoreConfig();
+        disconnectMenu();
       } else {
         console.log('🔋 Visibility: visible - resuming SSE connection');
-        connect();
+        connectStoreConfig();
+        connectMenu();
       }
     };
 
@@ -71,7 +77,8 @@ const SSEManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      disconnect();
+      disconnectStoreConfig();
+      disconnectMenu();
     };
   }, [isAuthenticated]);
 
