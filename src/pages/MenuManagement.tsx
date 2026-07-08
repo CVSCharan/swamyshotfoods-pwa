@@ -577,7 +577,6 @@ export const MenuManagement: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
 
           <div className="flex items-center gap-3 pt-4 shrink-0 border-t border-neutral-100 mt-2">
             <Button
