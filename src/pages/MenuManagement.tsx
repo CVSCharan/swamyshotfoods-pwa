@@ -407,6 +407,7 @@ export const MenuManagement: React.FC = () => {
               <label className="text-xs font-semibold text-neutral-700 font-display tracking-wide uppercase">Custom Timings</label>
               <div className="grid grid-cols-2 gap-4">
                 <Input
+                  type="time"
                   label="Morning Start"
                   value={formData.morningTimings?.startTime || ''}
                   onChange={(e) => setFormData({
@@ -416,6 +417,7 @@ export const MenuManagement: React.FC = () => {
                   placeholder="08:00"
                 />
                 <Input
+                  type="time"
                   label="Morning End"
                   value={formData.morningTimings?.endTime || ''}
                   onChange={(e) => setFormData({
@@ -427,6 +429,7 @@ export const MenuManagement: React.FC = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Input
+                  type="time"
                   label="Evening Start"
                   value={formData.eveningTimings?.startTime || ''}
                   onChange={(e) => setFormData({
@@ -436,6 +439,7 @@ export const MenuManagement: React.FC = () => {
                   placeholder="16:00"
                 />
                 <Input
+                  type="time"
                   label="Evening End"
                   value={formData.eveningTimings?.endTime || ''}
                   onChange={(e) => setFormData({
