@@ -309,14 +309,16 @@ export const MenuManagement: React.FC = () => {
         }}
         title={`${isEditModalVisible ? 'Edit' : 'Add'} Menu Item`}
       >
-        <div className="space-y-6 max-h-[75vh] overflow-y-auto px-1 scrollbar-hide pb-4">
+        <div className="space-y-10 max-h-[75vh] overflow-y-auto px-2 sm:px-4 py-4 scrollbar-hide">
           
           {/* Section 1: Basic Information */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
-            <h4 className="text-sm font-bold text-neutral-800 font-display border-b border-neutral-100 pb-2 mb-3">
-              Basic Details
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div>
+              <h4 className="text-base font-semibold text-neutral-900 tracking-tight">Basic Details</h4>
+              <p className="text-xs text-neutral-500 mt-1">Core information about the menu item.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <Input
                 label="Name *"
                 value={formData.name || ''}
@@ -358,7 +360,7 @@ export const MenuManagement: React.FC = () => {
               placeholder="Wheat flour, butter, etc..."
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <Input
                 label="Image URL"
                 value={formData.imgSrc || ''}
@@ -366,7 +368,7 @@ export const MenuManagement: React.FC = () => {
                 placeholder="https://example.com/image.jpg"
               />
               <Input
-                label="Priority (Display Order)"
+                label="Priority (Order)"
                 type="number"
                 value={formData.priority !== undefined ? formData.priority : ''}
                 onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })}
@@ -376,39 +378,40 @@ export const MenuManagement: React.FC = () => {
           </div>
 
           {/* Section 2: Timings */}
-          <div className="bg-neutral-50/50 p-4 sm:p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
-            <h4 className="text-sm font-bold text-neutral-800 font-display border-b border-neutral-100 pb-2 mb-3">
-              Availability & Timings
-            </h4>
-            
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-neutral-600 tracking-wide uppercase">Timing Template</label>
-              <select
-                value={formData.timingTemplate || ''}
-                onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white border border-neutral-200 rounded-xl text-sm text-neutral-700 shadow-sm focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all outline-none"
-              >
-                <option value="">Use Custom Timings</option>
-                {templates.map(t => (
-                  <option key={t.key} value={t.key}>{t.name}</option>
-                ))}
-              </select>
+          <div className="space-y-6 pt-8 border-t border-neutral-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h4 className="text-base font-semibold text-neutral-900 tracking-tight">Availability & Timings</h4>
+                <p className="text-xs text-neutral-500 mt-1">Configure when this item can be ordered.</p>
+              </div>
+              <div className="w-full sm:w-64">
+                <select
+                  value={formData.timingTemplate || ''}
+                  onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
+                  className="w-full px-4 py-2 bg-neutral-50/50 hover:bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all outline-none cursor-pointer"
+                >
+                  <option value="">Custom Timings</option>
+                  {templates.map(t => (
+                    <option key={t.key} value={t.key}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {formData.timingTemplate && (
-              <div className="bg-white p-4 rounded-xl border border-saffron-100 shadow-inner">
+              <div className="bg-neutral-50/50 p-5 rounded-2xl border border-neutral-100">
                 {(() => {
                   const t = templates.find(temp => temp.key === formData.timingTemplate);
                   if (!t) return <p className="text-xs text-neutral-500">Loading...</p>;
                   return (
-                    <div className="flex flex-col sm:flex-row gap-6">
-                      <div className="flex-1">
-                        <span className="text-[10px] font-bold text-saffron-600 uppercase tracking-wider block mb-1">Morning Session</span>
-                        <span className="text-sm font-medium text-neutral-700">{t.morningTimings?.startTime || 'Closed'} - {t.morningTimings?.endTime || 'Closed'}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-saffron-500"></div>Morning</span>
+                        <span className="text-sm font-medium text-neutral-800">{t.morningTimings?.startTime || 'Closed'} - {t.morningTimings?.endTime || 'Closed'}</span>
                       </div>
-                      <div className="flex-1">
-                        <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block mb-1">Evening Session</span>
-                        <span className="text-sm font-medium text-neutral-700">{t.eveningTimings?.startTime || 'Closed'} - {t.eveningTimings?.endTime || 'Closed'}</span>
+                      <div className="space-y-1.5">
+                        <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>Evening</span>
+                        <span className="text-sm font-medium text-neutral-800">{t.eveningTimings?.startTime || 'Closed'} - {t.eveningTimings?.endTime || 'Closed'}</span>
                       </div>
                     </div>
                   );
@@ -417,168 +420,164 @@ export const MenuManagement: React.FC = () => {
             )}
 
             {!formData.timingTemplate && (
-              <div className="space-y-4 pt-2">
-                <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
-                  <span className="text-[10px] font-bold text-saffron-600 uppercase tracking-wider block mb-3">Morning Session</span>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      type="time"
-                      label="Start Time"
-                      value={formData.morningTimings?.startTime || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
-                      })}
-                    />
-                    <Input
-                      type="time"
-                      label="End Time"
-                      value={formData.morningTimings?.endTime || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
-                      })}
-                    />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="bg-neutral-50/50 p-5 rounded-2xl border border-neutral-100 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-saffron-500"></div>
+                    <span className="text-[11px] font-bold text-neutral-600 uppercase tracking-widest">Morning</span>
                   </div>
+                  <Input
+                    type="time"
+                    label="Start Time"
+                    value={formData.morningTimings?.startTime || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
+                    })}
+                  />
+                  <Input
+                    type="time"
+                    label="End Time"
+                    value={formData.morningTimings?.endTime || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
+                    })}
+                  />
                 </div>
                 
-                <div className="bg-white p-4 rounded-xl border border-neutral-200 shadow-sm">
-                  <span className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider block mb-3">Evening Session</span>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      type="time"
-                      label="Start Time"
-                      value={formData.eveningTimings?.startTime || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
-                      })}
-                    />
-                    <Input
-                      type="time"
-                      label="End Time"
-                      value={formData.eveningTimings?.endTime || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
-                      })}
-                    />
+                <div className="bg-neutral-50/50 p-5 rounded-2xl border border-neutral-100 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
+                    <span className="text-[11px] font-bold text-neutral-600 uppercase tracking-widest">Evening</span>
                   </div>
+                  <Input
+                    type="time"
+                    label="Start Time"
+                    value={formData.eveningTimings?.startTime || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
+                    })}
+                  />
+                  <Input
+                    type="time"
+                    label="End Time"
+                    value={formData.eveningTimings?.endTime || ''}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
+                    })}
+                  />
                 </div>
               </div>
             )}
           </div>
 
-          {/* Section 3: Attributes (Pill Toggles) */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-neutral-100 shadow-sm space-y-5">
-            <h4 className="text-sm font-bold text-neutral-800 font-display border-b border-neutral-100 pb-2">
-              Item Attributes
-            </h4>
+          {/* Section 3: Attributes */}
+          <div className="space-y-6 pt-8 border-t border-neutral-100">
+            <div>
+              <h4 className="text-base font-semibold text-neutral-900 tracking-tight">Attributes & Badges</h4>
+              <p className="text-xs text-neutral-500 mt-1">Tags, dietary preferences, and highlights.</p>
+            </div>
 
-            {/* Allergens */}
-            <div className="space-y-2.5">
-              <label className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">Allergens</label>
-              <div className="flex flex-wrap gap-2">
-                {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => {
-                  const lowerAllergen = allergen.toLowerCase();
-                  const isChecked = formData.allergens?.map(a => a.toLowerCase()).includes(lowerAllergen) || false;
-                  return (
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Allergens</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => (
                     <button
                       key={allergen}
                       type="button"
                       onClick={() => {
-                        const current = formData.allergens?.map(a => a.toLowerCase()) || [];
-                        const updated = isChecked
-                          ? current.filter(a => a !== lowerAllergen)
-                          : [...current, lowerAllergen];
-                        setFormData({ ...formData, allergens: updated });
+                        const val = allergen.toLowerCase();
+                        const current = formData.allergens || [];
+                        setFormData({ 
+                          ...formData, 
+                          allergens: current.includes(val) ? current.filter(a => a !== val) : [...current, val] 
+                        });
                       }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
-                        isChecked 
-                          ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm ring-1 ring-amber-500/20"
-                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                      className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
+                        formData.allergens?.includes(allergen.toLowerCase())
+                          ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:text-neutral-700"
                       }`}
                     >
                       {allergen}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Dietary Labels */}
-            <div className="space-y-2.5">
-              <label className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">Dietary Labels</label>
-              <div className="flex flex-wrap gap-2">
-                {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => {
-                  const lowerLabel = label.toLowerCase();
-                  const isChecked = formData.dietaryLabels?.map(l => l.toLowerCase()).includes(lowerLabel) || false;
-                  return (
+              <div className="space-y-3">
+                <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Dietary Labels</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => (
                     <button
                       key={label}
                       type="button"
                       onClick={() => {
-                        const current = formData.dietaryLabels?.map(l => l.toLowerCase()) || [];
-                        const updated = isChecked
-                          ? current.filter(l => l !== lowerLabel)
-                          : [...current, lowerLabel];
-                        setFormData({ ...formData, dietaryLabels: updated });
+                        const val = label.toLowerCase();
+                        const current = formData.dietaryLabels || [];
+                        setFormData({ 
+                          ...formData, 
+                          dietaryLabels: current.includes(val) ? current.filter(l => l !== val) : [...current, val] 
+                        });
                       }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border ${
-                        isChecked 
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm ring-1 ring-emerald-500/20"
-                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                      className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
+                        formData.dietaryLabels?.includes(label.toLowerCase())
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm"
+                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:text-neutral-700"
                       }`}
                     >
                       {label}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Specials */}
-            <div className="space-y-2.5">
-              <label className="text-[11px] font-bold text-neutral-500 tracking-wider uppercase">Specials & Highlights</label>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, morningSpecial: !formData.morningSpecial })}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border flex items-center gap-1.5 ${
-                    formData.morningSpecial 
-                      ? "bg-sky-50 text-sky-700 border-sky-200 shadow-sm ring-1 ring-sky-500/20"
-                      : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                  }`}
-                >
-                  ☀️ Morning Special
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, eveningSpecial: !formData.eveningSpecial })}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border flex items-center gap-1.5 ${
-                    formData.eveningSpecial 
-                      ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm ring-1 ring-indigo-500/20"
-                      : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                  }`}
-                >
-                  🌙 Evening Special
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, dosaSpecial: !formData.dosaSpecial })}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 border flex items-center gap-1.5 ${
-                    formData.dosaSpecial 
-                      ? "bg-rose-50 text-rose-700 border-rose-200 shadow-sm ring-1 ring-rose-500/20"
-                      : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                  }`}
-                >
-                  🥞 Dosa Special
-                </button>
+              <div className="space-y-3">
+                <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Specials & Highlights</label>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, morningSpecial: !formData.morningSpecial })}
+                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                      formData.morningSpecial 
+                        ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                    }`}
+                  >
+                    ☀️ Morning Special
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, eveningSpecial: !formData.eveningSpecial })}
+                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                      formData.eveningSpecial 
+                        ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm"
+                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                    }`}
+                  >
+                    🌙 Evening Special
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, dosaSpecial: !formData.dosaSpecial })}
+                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                      formData.dosaSpecial 
+                        ? "bg-rose-50 text-rose-700 border-rose-200 shadow-sm"
+                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                    }`}
+                  >
+                    🥞 Dosa Special
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-4 shrink-0 border-t border-neutral-100 mt-2">
+          <div className="flex items-center gap-3 pt-6 shrink-0 border-t border-neutral-100 mt-2 px-2 sm:px-4 pb-2">
             <Button
               className="flex-1 bg-gradient-to-r from-saffron-500 to-amber-500 shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_4px_25px_rgba(245,158,11,0.45)] hover:from-saffron-400 hover:to-amber-400"
               onClick={isEditModalVisible ? handleUpdateItem : handleAddItem}
