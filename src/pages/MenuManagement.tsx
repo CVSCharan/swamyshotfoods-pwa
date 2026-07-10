@@ -153,6 +153,8 @@ export const MenuManagement: React.FC = () => {
       morningSpecial: false,
       eveningSpecial: false,
       dosaSpecial: false,
+      popular: false,
+      chefSpecial: false,
       morningTimings: null,
       eveningTimings: null,
     });
@@ -241,6 +243,12 @@ export const MenuManagement: React.FC = () => {
                   
                   {/* Tags / Badges */}
                   <div className="flex flex-wrap gap-1.5 mt-2 mb-2">
+                    {item.popular && (
+                      <Badge variant="warning" className="bg-orange-100 text-orange-700 text-[9px] px-1.5 py-0.5">🔥 Popular</Badge>
+                    )}
+                    {item.chefSpecial && (
+                      <Badge variant="neutral" className="bg-violet-100 text-violet-700 text-[9px] px-1.5 py-0.5">👨‍🍳 Chef Special</Badge>
+                    )}
                     {item.morningSpecial && (
                       <Badge variant="warning" className="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5">☀️ Morning Special</Badge>
                     )}
@@ -539,6 +547,28 @@ export const MenuManagement: React.FC = () => {
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Specials & Highlights</label>
                 <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, popular: !formData.popular })}
+                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                      formData.popular 
+                        ? "bg-orange-50 text-orange-700 border-orange-200 shadow-sm"
+                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                    }`}
+                  >
+                    🔥 Popular
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, chefSpecial: !formData.chefSpecial })}
+                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                      formData.chefSpecial 
+                        ? "bg-violet-50 text-violet-700 border-violet-200 shadow-sm"
+                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                    }`}
+                  >
+                    👨‍🍳 Chef Special
+                  </button>
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, morningSpecial: !formData.morningSpecial })}

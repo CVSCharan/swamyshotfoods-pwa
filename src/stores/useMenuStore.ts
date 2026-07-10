@@ -20,6 +20,8 @@ export interface MenuItem {
   morningSpecial?: boolean;
   eveningSpecial?: boolean;
   dosaSpecial?: boolean;
+  popular?: boolean;
+  chefSpecial?: boolean;
   priority: number;
   imgSrc: string;
 }
