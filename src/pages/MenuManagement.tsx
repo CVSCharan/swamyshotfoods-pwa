@@ -137,12 +137,23 @@ export const MenuManagement: React.FC = () => {
   const onSubmit = async (data: MenuFormValues) => {
     setLoading(true);
     try {
+      // Map zod form data safely to MenuItem
+      const payload: Partial<MenuItem> = {
+        ...data,
+        morningTimings: data.morningTimings?.startTime && data.morningTimings?.endTime
+          ? { startTime: data.morningTimings.startTime, endTime: data.morningTimings.endTime }
+          : undefined,
+        eveningTimings: data.eveningTimings?.startTime && data.eveningTimings?.endTime
+          ? { startTime: data.eveningTimings.startTime, endTime: data.eveningTimings.endTime }
+          : undefined,
+      };
+
       if (isEditModalVisible && selectedItem) {
-        await menuService.update(selectedItem._id, data as unknown as Partial<MenuItem>);
-        updateItem(selectedItem._id, data as unknown as Partial<MenuItem>);
+        await menuService.update(selectedItem._id, payload);
+        updateItem(selectedItem._id, payload);
         toast.success('Menu item updated');
       } else {
-        const newItem = await menuService.create(data as unknown as Partial<MenuItem>);
+        const newItem = await menuService.create(payload);
         addItem(newItem);
         toast.success('Menu item added');
       }
