@@ -71,6 +71,22 @@ export const MenuManagement: React.FC = () => {
     if (formData.price === undefined || formData.price <= 0) {
       errors.price = 'Price must be a positive number';
     }
+    
+    if (!formData.timingTemplate) {
+      if (formData.morningTimings?.startTime && !formData.morningTimings?.endTime) {
+        errors.morningEndTime = 'Morning end time is required';
+      }
+      if (!formData.morningTimings?.startTime && formData.morningTimings?.endTime) {
+        errors.morningStartTime = 'Morning start time is required';
+      }
+      if (formData.eveningTimings?.startTime && !formData.eveningTimings?.endTime) {
+        errors.eveningEndTime = 'Evening end time is required';
+      }
+      if (!formData.eveningTimings?.startTime && formData.eveningTimings?.endTime) {
+        errors.eveningStartTime = 'Evening start time is required';
+      }
+    }
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -438,19 +454,27 @@ export const MenuManagement: React.FC = () => {
                     type="time"
                     label="Start Time"
                     value={formData.morningTimings?.startTime || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
-                    })}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
+                      });
+                      setFormErrors({ ...formErrors, morningStartTime: '', morningEndTime: '' });
+                    }}
+                    error={formErrors.morningStartTime}
                   />
                   <Input
                     type="time"
                     label="End Time"
                     value={formData.morningTimings?.endTime || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
-                    })}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
+                      });
+                      setFormErrors({ ...formErrors, morningStartTime: '', morningEndTime: '' });
+                    }}
+                    error={formErrors.morningEndTime}
                   />
                 </div>
                 
@@ -463,19 +487,27 @@ export const MenuManagement: React.FC = () => {
                     type="time"
                     label="Start Time"
                     value={formData.eveningTimings?.startTime || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
-                    })}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
+                      });
+                      setFormErrors({ ...formErrors, eveningStartTime: '', eveningEndTime: '' });
+                    }}
+                    error={formErrors.eveningStartTime}
                   />
                   <Input
                     type="time"
                     label="End Time"
                     value={formData.eveningTimings?.endTime || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
-                    })}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
+                      });
+                      setFormErrors({ ...formErrors, eveningStartTime: '', eveningEndTime: '' });
+                    }}
+                    error={formErrors.eveningEndTime}
                   />
                 </div>
               </div>
