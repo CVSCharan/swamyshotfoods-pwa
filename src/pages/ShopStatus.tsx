@@ -7,7 +7,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Switch } from '../components/ui/Switch';
 import { Badge } from '../components/ui/Badge';
-import { AlertCircle, Camera, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, Camera } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const ShopStatus: React.FC = () => {
@@ -22,7 +22,6 @@ export const ShopStatus: React.FC = () => {
   const [menuHeaderText, setMenuHeaderText] = useState('');
   const [menuFooterText, setMenuFooterText] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   // Sync state values when config changes (e.g. from SSE)
   useEffect(() => {
@@ -35,10 +34,7 @@ export const ShopStatus: React.FC = () => {
     }
   }, [config]);
 
-  const showNotification = (text: string, type: 'success' | 'error' = 'success') => {
-    setMessage({ text, type });
-    setTimeout(() => setMessage(null), 3000);
-  };
+
 
   const updateConfig = async (updates: Partial<StoreConfig>) => {
     setLoading(true);
@@ -47,10 +43,10 @@ export const ShopStatus: React.FC = () => {
       if (updatedConfig) {
         setConfig(updatedConfig);
       }
-      showNotification('Store status updated successfully!');
+      toast.success('Store status updated successfully!');
     } catch (err) {
       console.error(err);
-      showNotification('Failed to update store status', 'error');
+      toast.error('Failed to update store status');
     } finally {
       setLoading(false);
     }
@@ -72,7 +68,7 @@ export const ShopStatus: React.FC = () => {
       }
     };
     reader.onerror = () => {
-      showNotification('Failed to read image file', 'error');
+      toast.error('Failed to read image file');
     };
     reader.readAsDataURL(file);
   };
@@ -93,7 +89,7 @@ export const ShopStatus: React.FC = () => {
       }
     };
     reader.onerror = () => {
-      showNotification('Failed to read image file', 'error');
+      toast.error('Failed to read image file');
     };
     reader.readAsDataURL(file);
   };
@@ -125,20 +121,7 @@ export const ShopStatus: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       
-      {/* Toast Notification */}
-      {message && (
-        <div
-          className={`fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 px-5 py-3.5 rounded-full border shadow-2xl font-display font-bold text-sm animate-slide-up bg-white max-w-[90vw] whitespace-nowrap ${
-            message.type === 'success'
-              ? 'text-emerald-600 border-emerald-200 shadow-emerald-500/20'
-              : 'text-red-600 border-red-200 shadow-red-500/20'
-          }`}
-          style={{ marginBottom: 'env(safe-area-inset-bottom)' }}
-        >
-          {message.type === 'success' ? <CheckCircle2 size={20} className="text-emerald-500 shrink-0" /> : <AlertCircle size={20} className="text-red-500 shrink-0" />}
-          <span className="truncate">{message.text}</span>
-        </div>
-      )}
+
 
       {/* Connection warning in body if offline */}
       {!isConnected && (

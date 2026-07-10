@@ -138,11 +138,11 @@ export const MenuManagement: React.FC = () => {
     setLoading(true);
     try {
       if (isEditModalVisible && selectedItem) {
-        await menuService.update(selectedItem._id, data);
-        updateItem(selectedItem._id, data);
+        await menuService.update(selectedItem._id, data as unknown as Partial<MenuItem>);
+        updateItem(selectedItem._id, data as unknown as Partial<MenuItem>);
         toast.success('Menu item updated');
       } else {
-        const newItem = await menuService.create(data);
+        const newItem = await menuService.create(data as unknown as Partial<MenuItem>);
         addItem(newItem);
         toast.success('Menu item added');
       }

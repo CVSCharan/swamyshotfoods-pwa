@@ -17,5 +17,21 @@ export const menuService = {
   update: (id: string, data: Partial<MenuItem>) =>
     apiClient.put<MenuItem>(`/menu/${id}`, data),
   delete: (id: string) => apiClient.delete(`/menu/${id}`),
+  assignTemplate: (id: string, data: { templateId: string }) => 
+    apiClient.put<MenuItem>(`/menu/${id}/assign-template`, data),
+  bulkAssignTemplate: (data: { itemIds: string[]; templateId: string }) =>
+    apiClient.post<any>('/menu/bulk-assign-template', data),
+  setCustomTimings: (id: string, data: { morningTimings?: any; eveningTimings?: any }) =>
+    apiClient.put<MenuItem>(`/menu/${id}/custom-timings`, data),
+  getAvailableNow: () => apiClient.get<MenuItem[]>('/menu/available/now'),
+  getByTimeSlot: (slot: 'morning' | 'evening') => 
+    apiClient.get<MenuItem[]>(`/menu/available/${slot}`),
+
   getTimingTemplates: () => apiClient.get<TimingTemplate[]>('/admin/timing-templates'),
+  createTimingTemplate: (data: Partial<TimingTemplate>) => 
+    apiClient.post<TimingTemplate>('/admin/timing-templates', data),
+  updateTimingTemplate: (id: string, data: Partial<TimingTemplate>) =>
+    apiClient.put<TimingTemplate>(`/admin/timing-templates/${id}`, data),
+  deleteTimingTemplate: (id: string) => 
+    apiClient.delete(`/admin/timing-templates/${id}`),
 };
