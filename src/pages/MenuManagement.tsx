@@ -10,11 +10,24 @@ import { Modal } from '../components/ui/Modal';
 import { Badge } from '../components/ui/Badge';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const menuItemSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  price: z.number().positive('Price must be a positive number'),
+  price: z.number().min(0, 'Price must be a positive number'),
+  desc: z.string().min(1, 'Description is required'),
+  ingredients: z.string().optional(),
+  priority: z.number().int().min(1, 'Priority must be at least 1'),
+  imgSrc: z.string().url('Image source must be a valid URL').or(z.literal('')),
   timingTemplate: z.string().optional(),
+  allergens: z.array(z.string()).optional(),
+  dietaryLabels: z.array(z.string()).optional(),
+  morningSpecial: z.boolean().optional(),
+  eveningSpecial: z.boolean().optional(),
+  dosaSpecial: z.boolean().optional(),
+  popular: z.boolean().optional(),
+  chefSpecial: z.boolean().optional(),
   morningTimings: z.object({
     startTime: z.string().optional(),
     endTime: z.string().optional(),
@@ -35,8 +48,10 @@ const menuItemSchema = z.object({
   return true;
 }, {
   message: "Start and end times must both be provided if one is set",
-  path: ["morningStartTime"] // Generic path for the complex validation
+  path: ["timingTemplate"]
 });
+
+type MenuFormValues = z.infer<typeof menuItemSchema>;
 
 export const MenuManagement: React.FC = () => {
   const {
@@ -56,16 +71,41 @@ export const MenuManagement: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [templates, setTemplates] = useState<TimingTemplate[]>([]);
 
-  const [formData, setFormData] = useState<Partial<MenuItem>>({
+  const defaultValues: MenuFormValues = {
     name: '',
     price: 0,
     desc: '',
     ingredients: '',
     priority: 1,
     imgSrc: '',
+    timingTemplate: '',
+    allergens: [],
+    dietaryLabels: [],
+    morningSpecial: false,
+    eveningSpecial: false,
+    dosaSpecial: false,
+    popular: false,
+    chefSpecial: false,
+    morningTimings: null,
+    eveningTimings: null,
+  };
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    setValue,
+    formState: { errors }
+  } = useForm<MenuFormValues>({
+    resolver: zodResolver(menuItemSchema),
+    defaultValues
   });
 
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const watchTimingTemplate = watch('timingTemplate');
+  const watchAllergens = watch('allergens') || [];
+  const watchDietary = watch('dietaryLabels') || [];
 
   useEffect(() => {
     fetchMenuItems();
@@ -94,59 +134,24 @@ export const MenuManagement: React.FC = () => {
     }
   };
 
-  const validateForm = (): boolean => {
-    const result = menuItemSchema.safeParse(formData);
-    if (!result.success) {
-      const errors: Record<string, string> = {};
-      result.error.issues.forEach(issue => {
-        if (issue.path[0]) {
-          errors[issue.path[0].toString()] = issue.message;
-        }
-      });
-      // Handle the complex custom refinement errors manually if needed
-      if (!formData.timingTemplate) {
-        if (formData.morningTimings?.startTime && !formData.morningTimings?.endTime) errors.morningEndTime = 'Morning end time is required';
-        if (!formData.morningTimings?.startTime && formData.morningTimings?.endTime) errors.morningStartTime = 'Morning start time is required';
-        if (formData.eveningTimings?.startTime && !formData.eveningTimings?.endTime) errors.eveningEndTime = 'Evening end time is required';
-        if (!formData.eveningTimings?.startTime && formData.eveningTimings?.endTime) errors.eveningStartTime = 'Evening start time is required';
+  const onSubmit = async (data: MenuFormValues) => {
+    setLoading(true);
+    try {
+      if (isEditModalVisible && selectedItem) {
+        await menuService.update(selectedItem._id, data);
+        updateItem(selectedItem._id, data);
+        toast.success('Menu item updated');
+      } else {
+        const newItem = await menuService.create(data);
+        addItem(newItem);
+        toast.success('Menu item added');
       }
-      setFormErrors(errors);
-      return false;
-    }
-    setFormErrors({});
-    return true;
-  };
-
-  const handleAddItem = async () => {
-    if (!validateForm()) return;
-
-    setLoading(true);
-    try {
-      const newItem = await menuService.create(formData);
-      addItem(newItem);
       setAddModalVisible(false);
-      resetForm();
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to add menu item');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpdateItem = async () => {
-    if (!selectedItem || !validateForm()) return;
-
-    setLoading(true);
-    console.log("Submitting formData:", formData);
-    try {
-      await menuService.update(selectedItem._id, formData);
-      updateItem(selectedItem._id, formData);
       setEditModalVisible(false);
-      resetForm();
+      reset(defaultValues);
     } catch (err) {
       console.error(err);
-      toast.error('Failed to update menu item');
+      toast.error(isEditModalVisible ? 'Failed to update item' : 'Failed to add item');
     } finally {
       setLoading(false);
     }
@@ -154,13 +159,13 @@ export const MenuManagement: React.FC = () => {
 
   const handleDeleteItem = async () => {
     if (!selectedItem) return;
-
     setLoading(true);
     try {
       await menuService.delete(selectedItem._id);
       deleteItem(selectedItem._id);
       setDeleteModalVisible(false);
       setSelectedItem(null);
+      toast.success('Menu item deleted');
     } catch (err) {
       console.error(err);
       toast.error('Failed to delete menu item');
@@ -171,8 +176,24 @@ export const MenuManagement: React.FC = () => {
 
   const openEditModal = (item: MenuItem) => {
     setSelectedItem(item);
-    setFormData(item);
-    setFormErrors({});
+    reset({
+      name: item.name,
+      price: item.price,
+      desc: item.desc || '',
+      ingredients: item.ingredients || '',
+      priority: item.priority || 1,
+      imgSrc: item.imgSrc || '',
+      timingTemplate: item.timingTemplate || '',
+      allergens: item.allergens || [],
+      dietaryLabels: item.dietaryLabels || [],
+      morningSpecial: item.morningSpecial || false,
+      eveningSpecial: item.eveningSpecial || false,
+      dosaSpecial: item.dosaSpecial || false,
+      popular: item.popular || false,
+      chefSpecial: item.chefSpecial || false,
+      morningTimings: item.morningTimings || null,
+      eveningTimings: item.eveningTimings || null,
+    });
     setEditModalVisible(true);
   };
 
@@ -181,32 +202,9 @@ export const MenuManagement: React.FC = () => {
     setDeleteModalVisible(true);
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      price: 0,
-      desc: '',
-      ingredients: '',
-      priority: 1,
-      imgSrc: '',
-      timingTemplate: '',
-      allergens: [],
-      dietaryLabels: [],
-      morningSpecial: false,
-      eveningSpecial: false,
-      dosaSpecial: false,
-      popular: false,
-      chefSpecial: false,
-      morningTimings: null,
-      eveningTimings: null,
-    });
-    setFormErrors({});
-    setSelectedItem(null);
-  };
-
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.desc.toLowerCase().includes(searchQuery.toLowerCase())
+    (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -227,7 +225,7 @@ export const MenuManagement: React.FC = () => {
         </div>
         <Button
           onClick={() => {
-            resetForm();
+            reset(defaultValues);
             setAddModalVisible(true);
           }}
           className="flex items-center gap-2 justify-center py-2.5"
@@ -355,11 +353,11 @@ export const MenuManagement: React.FC = () => {
         onDismiss={() => {
           setAddModalVisible(false);
           setEditModalVisible(false);
-          resetForm();
+          reset(defaultValues);
         }}
         title={`${isEditModalVisible ? 'Edit' : 'Add'} Menu Item`}
       >
-        <div className="space-y-10 px-2 sm:px-4 py-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-10 px-2 sm:px-4 py-4">
           
           {/* Section 1: Basic Information */}
           <div className="space-y-6">
@@ -371,33 +369,25 @@ export const MenuManagement: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <Input
                 label="Name *"
-                value={formData.name || ''}
-                onChange={(e) => {
-                  setFormData({ ...formData, name: e.target.value });
-                  if (formErrors.name) setFormErrors({ ...formErrors, name: '' });
-                }}
-                error={formErrors.name}
+                {...register('name')}
+                error={errors.name?.message}
                 placeholder="E.g. Butter Roti"
               />
               <Input
                 label="Price (₹) *"
                 type="number"
-                value={formData.price !== undefined ? formData.price : ''}
-                onChange={(e) => {
-                  setFormData({ ...formData, price: parseFloat(e.target.value) || 0 });
-                  if (formErrors.price) setFormErrors({ ...formErrors, price: '' });
-                }}
-                error={formErrors.price}
+                {...register('price', { valueAsNumber: true })}
+                error={errors.price?.message}
                 placeholder="E.g. 40"
               />
             </div>
             
             <Input
-              label="Description"
+              label="Description *"
               multiline
               numberOfLines={2}
-              value={formData.desc || ''}
-              onChange={(e) => setFormData({ ...formData, desc: e.target.value })}
+              {...register('desc')}
+              error={errors.desc?.message}
               placeholder="Brief item details..."
             />
 
@@ -405,23 +395,23 @@ export const MenuManagement: React.FC = () => {
               label="Ingredients"
               multiline
               numberOfLines={2}
-              value={formData.ingredients || ''}
-              onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+              {...register('ingredients')}
+              error={errors.ingredients?.message}
               placeholder="Wheat flour, butter, etc..."
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
               <Input
-                label="Image URL"
-                value={formData.imgSrc || ''}
-                onChange={(e) => setFormData({ ...formData, imgSrc: e.target.value })}
+                label="Image URL *"
+                {...register('imgSrc')}
+                error={errors.imgSrc?.message}
                 placeholder="https://example.com/image.jpg"
               />
               <Input
                 label="Priority (Order)"
                 type="number"
-                value={formData.priority !== undefined ? formData.priority : ''}
-                onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) || 1 })}
+                {...register('priority', { valueAsNumber: true })}
+                error={errors.priority?.message}
                 placeholder="1 = Highest"
               />
             </div>
@@ -433,11 +423,11 @@ export const MenuManagement: React.FC = () => {
               <div>
                 <h4 className="text-base font-semibold text-neutral-900 tracking-tight">Availability & Timings</h4>
                 <p className="text-xs text-neutral-500 mt-1">Configure when this item can be ordered.</p>
+                {errors.timingTemplate && <p className="text-xs text-red-500 mt-1">{errors.timingTemplate.message}</p>}
               </div>
               <div className="w-full sm:w-64">
                 <select
-                  value={formData.timingTemplate || ''}
-                  onChange={(e) => setFormData({ ...formData, timingTemplate: e.target.value })}
+                  {...register('timingTemplate')}
                   className="w-full px-4 py-2 bg-neutral-50/50 hover:bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 transition-all outline-none cursor-pointer"
                 >
                   <option value="">Custom Timings</option>
@@ -448,10 +438,10 @@ export const MenuManagement: React.FC = () => {
               </div>
             </div>
 
-            {formData.timingTemplate && (
+            {watchTimingTemplate && (
               <div className="bg-neutral-50/50 p-5 rounded-2xl border border-neutral-100">
                 {(() => {
-                  const t = templates.find(temp => temp.key === formData.timingTemplate);
+                  const t = templates.find(temp => temp.key === watchTimingTemplate);
                   if (!t) return <p className="text-xs text-neutral-500">Loading...</p>;
                   return (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -469,7 +459,7 @@ export const MenuManagement: React.FC = () => {
               </div>
             )}
 
-            {!formData.timingTemplate && (
+            {!watchTimingTemplate && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="bg-neutral-50/50 p-5 rounded-2xl border border-neutral-100 space-y-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -479,28 +469,14 @@ export const MenuManagement: React.FC = () => {
                   <Input
                     type="time"
                     label="Start Time"
-                    value={formData.morningTimings?.startTime || ''}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        morningTimings: { ...formData.morningTimings, startTime: e.target.value, endTime: formData.morningTimings?.endTime || '' }
-                      });
-                      setFormErrors({ ...formErrors, morningStartTime: '', morningEndTime: '' });
-                    }}
-                    error={formErrors.morningStartTime}
+                    {...register('morningTimings.startTime')}
+                    error={errors.morningTimings?.startTime?.message}
                   />
                   <Input
                     type="time"
                     label="End Time"
-                    value={formData.morningTimings?.endTime || ''}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        morningTimings: { ...formData.morningTimings, endTime: e.target.value, startTime: formData.morningTimings?.startTime || '' }
-                      });
-                      setFormErrors({ ...formErrors, morningStartTime: '', morningEndTime: '' });
-                    }}
-                    error={formErrors.morningEndTime}
+                    {...register('morningTimings.endTime')}
+                    error={errors.morningTimings?.endTime?.message}
                   />
                 </div>
                 
@@ -512,28 +488,14 @@ export const MenuManagement: React.FC = () => {
                   <Input
                     type="time"
                     label="Start Time"
-                    value={formData.eveningTimings?.startTime || ''}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        eveningTimings: { ...formData.eveningTimings, startTime: e.target.value, endTime: formData.eveningTimings?.endTime || '' }
-                      });
-                      setFormErrors({ ...formErrors, eveningStartTime: '', eveningEndTime: '' });
-                    }}
-                    error={formErrors.eveningStartTime}
+                    {...register('eveningTimings.startTime')}
+                    error={errors.eveningTimings?.startTime?.message}
                   />
                   <Input
                     type="time"
                     label="End Time"
-                    value={formData.eveningTimings?.endTime || ''}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        eveningTimings: { ...formData.eveningTimings, endTime: e.target.value, startTime: formData.eveningTimings?.startTime || '' }
-                      });
-                      setFormErrors({ ...formErrors, eveningStartTime: '', eveningEndTime: '' });
-                    }}
-                    error={formErrors.eveningEndTime}
+                    {...register('eveningTimings.endTime')}
+                    error={errors.eveningTimings?.endTime?.message}
                   />
                 </div>
               </div>
@@ -551,141 +513,178 @@ export const MenuManagement: React.FC = () => {
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Allergens</label>
                 <div className="flex flex-wrap gap-2">
-                  {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => (
-                    <button
-                      key={allergen}
-                      type="button"
-                      onClick={() => {
-                        const val = allergen.toLowerCase();
-                        const current = formData.allergens || [];
-                        setFormData({ 
-                          ...formData, 
-                          allergens: current.includes(val) ? current.filter(a => a !== val) : [...current, val] 
-                        });
-                      }}
-                      className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
-                        formData.allergens?.includes(allergen.toLowerCase())
-                          ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
-                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:text-neutral-700"
-                      }`}
-                    >
-                      {allergen}
-                    </button>
-                  ))}
+                  {['Dairy', 'Nuts', 'Gluten', 'Soy'].map(allergen => {
+                    const val = allergen.toLowerCase();
+                    const isSelected = watchAllergens.includes(val);
+                    return (
+                      <button
+                        key={allergen}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setValue('allergens', watchAllergens.filter(a => a !== val));
+                          } else {
+                            setValue('allergens', [...watchAllergens, val]);
+                          }
+                        }}
+                        className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
+                          isSelected
+                            ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:text-neutral-700"
+                        }`}
+                      >
+                        {allergen}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Dietary Labels</label>
                 <div className="flex flex-wrap gap-2">
-                  {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => {
-                        const val = label.toLowerCase();
-                        const current = formData.dietaryLabels || [];
-                        setFormData({ 
-                          ...formData, 
-                          dietaryLabels: current.includes(val) ? current.filter(l => l !== val) : [...current, val] 
-                        });
-                      }}
-                      className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
-                        formData.dietaryLabels?.includes(label.toLowerCase())
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm"
-                          : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:text-neutral-700"
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                  {['Vegetarian', 'Vegan', 'Jain', 'Gluten-Free'].map(label => {
+                    const val = label.toLowerCase();
+                    const isSelected = watchDietary.includes(val);
+                    return (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setValue('dietaryLabels', watchDietary.filter(a => a !== val));
+                          } else {
+                            setValue('dietaryLabels', [...watchDietary, val]);
+                          }
+                        }}
+                        className={`px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200 border ${
+                          isSelected
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:text-neutral-700"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
 
               <div className="space-y-3">
                 <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest">Specials & Highlights</label>
                 <div className="flex flex-wrap gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, popular: !formData.popular })}
-                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
-                      formData.popular 
-                        ? "bg-orange-50 text-orange-700 border-orange-200 shadow-sm"
-                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                    }`}
-                  >
-                    🔥 Popular
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, chefSpecial: !formData.chefSpecial })}
-                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
-                      formData.chefSpecial 
-                        ? "bg-violet-50 text-violet-700 border-violet-200 shadow-sm"
-                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                    }`}
-                  >
-                    👨‍🍳 Chef Special
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, morningSpecial: !formData.morningSpecial })}
-                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
-                      formData.morningSpecial 
-                        ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
-                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                    }`}
-                  >
-                    ☀️ Morning Special
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, eveningSpecial: !formData.eveningSpecial })}
-                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
-                      formData.eveningSpecial 
-                        ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm"
-                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                    }`}
-                  >
-                    🌙 Evening Special
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, dosaSpecial: !formData.dosaSpecial })}
-                    className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
-                      formData.dosaSpecial 
-                        ? "bg-rose-50 text-rose-700 border-rose-200 shadow-sm"
-                        : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
-                    }`}
-                  >
-                    🥞 Dosa Special
-                  </button>
+                  <Controller
+                    name="popular"
+                    control={control}
+                    render={({ field }) => (
+                      <button
+                        type="button"
+                        onClick={() => field.onChange(!field.value)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                          field.value 
+                            ? "bg-orange-50 text-orange-700 border-orange-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                        }`}
+                      >
+                        🔥 Popular
+                      </button>
+                    )}
+                  />
+                  <Controller
+                    name="chefSpecial"
+                    control={control}
+                    render={({ field }) => (
+                      <button
+                        type="button"
+                        onClick={() => field.onChange(!field.value)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                          field.value 
+                            ? "bg-violet-50 text-violet-700 border-violet-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                        }`}
+                      >
+                        👨‍🍳 Chef Special
+                      </button>
+                    )}
+                  />
+                  <Controller
+                    name="morningSpecial"
+                    control={control}
+                    render={({ field }) => (
+                      <button
+                        type="button"
+                        onClick={() => field.onChange(!field.value)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                          field.value 
+                            ? "bg-amber-50 text-amber-700 border-amber-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                        }`}
+                      >
+                        ☀️ Morning Special
+                      </button>
+                    )}
+                  />
+                  <Controller
+                    name="eveningSpecial"
+                    control={control}
+                    render={({ field }) => (
+                      <button
+                        type="button"
+                        onClick={() => field.onChange(!field.value)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                          field.value 
+                            ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                        }`}
+                      >
+                        🌙 Evening Special
+                      </button>
+                    )}
+                  />
+                  <Controller
+                    name="dosaSpecial"
+                    control={control}
+                    render={({ field }) => (
+                      <button
+                        type="button"
+                        onClick={() => field.onChange(!field.value)}
+                        className={`px-4 py-2 rounded-xl text-[13px] font-semibold transition-all duration-200 border flex items-center gap-2 ${
+                          field.value 
+                            ? "bg-rose-50 text-rose-700 border-rose-200 shadow-sm"
+                            : "bg-white text-neutral-500 border-neutral-200 hover:bg-neutral-50 hover:border-neutral-300"
+                        }`}
+                      >
+                        🥞 Dosa Special
+                      </button>
+                    )}
+                  />
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 pt-6 shrink-0 border-t border-neutral-100 mt-2 px-2 sm:px-4 pb-2">
+          <div className="flex items-center gap-3 pt-6 shrink-0 border-t border-neutral-100 mt-2 pb-2">
             <Button
+              type="submit"
               className="flex-1 bg-gradient-to-r from-saffron-500 to-amber-500 shadow-[0_4px_20px_rgba(245,158,11,0.3)] hover:shadow-[0_4px_25px_rgba(245,158,11,0.45)] hover:from-saffron-400 hover:to-amber-400"
-              onClick={isEditModalVisible ? handleUpdateItem : handleAddItem}
               loading={loading}
             >
               {isEditModalVisible ? 'Update Item' : 'Create Item'}
             </Button>
             <Button
+              type="button"
               variant="outline"
               className="flex-1 border-neutral-200 text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 hover:border-neutral-300 shadow-sm"
               onClick={() => {
                 setAddModalVisible(false);
                 setEditModalVisible(false);
-                resetForm();
+                reset(defaultValues);
               }}
             >
               Cancel
             </Button>
           </div>
-        </div>
+        </form>
       </Modal>
 
       {/* Delete Confirmation Dialog */}
