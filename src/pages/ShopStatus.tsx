@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { Switch } from '../components/ui/Switch';
 import { Badge } from '../components/ui/Badge';
 import { AlertCircle, Camera, CheckCircle2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export const ShopStatus: React.FC = () => {
   const { config, isConnected, setConfig } = useStoreConfigStore();
@@ -60,7 +61,7 @@ export const ShopStatus: React.FC = () => {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('File is too large. Max size is 10MB.');
+      toast.error('File is too large. Max size is 10MB.');
       return;
     }
 
@@ -81,7 +82,7 @@ export const ShopStatus: React.FC = () => {
     if (!file) return;
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('File is too large. Max size is 10MB.');
+      toast.error('File is too large. Max size is 10MB.');
       return;
     }
 

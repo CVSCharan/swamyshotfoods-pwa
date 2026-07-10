@@ -1,31 +1,44 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User as UserIcon, Lock } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useAuthStore } from '../stores/useAuthStore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 
+const loginSchema = z.object({
+  username: z.string().min(1, 'Username is required'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
 export const Login: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const { login, error, setError } = useAuthStore();
+  const { login, error: storeError, setError } = useAuthStore();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!username.trim() || !password.trim()) {
-      alert('Please enter username and password');
-      return;
-    }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
 
+  const onSubmit = async (data: LoginFormValues) => {
     setLoading(true);
     setError(null);
 
     try {
-      await login(username.trim(), password);
+      await login(data.username.trim(), data.password);
       navigate('/');
     } catch (err: any) {
       console.error('❌ Login error:', err);
@@ -57,14 +70,11 @@ export const Login: React.FC = () => {
           <CardDescription>Sign in to manage your shop, status, and menu</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <Input
               label="Username"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                if (error) setError(null);
-              }}
+              {...register('username')}
+              error={errors.username?.message}
               autoCapitalize="none"
               autoComplete="username"
               leftIcon={UserIcon}
@@ -74,12 +84,9 @@ export const Login: React.FC = () => {
 
             <Input
               label="Password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (error) setError(null);
-              }}
               type="password"
+              {...register('password')}
+              error={errors.password?.message}
               autoCapitalize="none"
               autoComplete="current-password"
               leftIcon={Lock}
@@ -87,9 +94,9 @@ export const Login: React.FC = () => {
               placeholder="Enter password"
             />
 
-            {error && (
+            {storeError && (
               <div className="text-xs text-red-500 font-semibold bg-red-500/10 border border-red-500/25 px-3 py-2 rounded-xl">
-                {error}
+                {storeError}
               </div>
             )}
 

@@ -1,4 +1,5 @@
 import { config } from '../config/env';
+import { toast } from 'sonner';
 
 const TOKEN_KEY = '@swamys_token';
 const USER_KEY = '@swamys_user';
@@ -49,7 +50,7 @@ class ApiClient {
       localStorage.removeItem(USER_KEY);
 
       // Alert user
-      alert('Your session has expired. Please log in again.');
+      toast.error('Your session has expired. Please log in again.');
       
       // Force reload to update app state and redirect to login
       window.location.reload();

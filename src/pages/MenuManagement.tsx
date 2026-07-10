@@ -8,6 +8,35 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { Badge } from '../components/ui/Badge';
+import { z } from 'zod';
+import { toast } from 'sonner';
+
+const menuItemSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  price: z.number().positive('Price must be a positive number'),
+  timingTemplate: z.string().optional(),
+  morningTimings: z.object({
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+  }).nullable().optional(),
+  eveningTimings: z.object({
+    startTime: z.string().optional(),
+    endTime: z.string().optional(),
+  }).nullable().optional(),
+}).refine(data => {
+  if (!data.timingTemplate) {
+    const mt = data.morningTimings;
+    if (mt?.startTime && !mt.endTime) return false;
+    if (!mt?.startTime && mt?.endTime) return false;
+    const et = data.eveningTimings;
+    if (et?.startTime && !et.endTime) return false;
+    if (!et?.startTime && et?.endTime) return false;
+  }
+  return true;
+}, {
+  message: "Start and end times must both be provided if one is set",
+  path: ["morningStartTime"] // Generic path for the complex validation
+});
 
 export const MenuManagement: React.FC = () => {
   const {
@@ -59,36 +88,33 @@ export const MenuManagement: React.FC = () => {
       setItems(data);
     } catch (err) {
       console.error(err);
-      alert('Failed to fetch menu items');
+      toast.error('Failed to fetch menu items');
     } finally {
       setLoading(false);
     }
   };
 
   const validateForm = (): boolean => {
-    const errors: Record<string, string> = {};
-    if (!formData.name?.trim()) errors.name = 'Name is required';
-    if (formData.price === undefined || formData.price <= 0) {
-      errors.price = 'Price must be a positive number';
+    const result = menuItemSchema.safeParse(formData);
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach(issue => {
+        if (issue.path[0]) {
+          errors[issue.path[0].toString()] = issue.message;
+        }
+      });
+      // Handle the complex custom refinement errors manually if needed
+      if (!formData.timingTemplate) {
+        if (formData.morningTimings?.startTime && !formData.morningTimings?.endTime) errors.morningEndTime = 'Morning end time is required';
+        if (!formData.morningTimings?.startTime && formData.morningTimings?.endTime) errors.morningStartTime = 'Morning start time is required';
+        if (formData.eveningTimings?.startTime && !formData.eveningTimings?.endTime) errors.eveningEndTime = 'Evening end time is required';
+        if (!formData.eveningTimings?.startTime && formData.eveningTimings?.endTime) errors.eveningStartTime = 'Evening start time is required';
+      }
+      setFormErrors(errors);
+      return false;
     }
-    
-    if (!formData.timingTemplate) {
-      if (formData.morningTimings?.startTime && !formData.morningTimings?.endTime) {
-        errors.morningEndTime = 'Morning end time is required';
-      }
-      if (!formData.morningTimings?.startTime && formData.morningTimings?.endTime) {
-        errors.morningStartTime = 'Morning start time is required';
-      }
-      if (formData.eveningTimings?.startTime && !formData.eveningTimings?.endTime) {
-        errors.eveningEndTime = 'Evening end time is required';
-      }
-      if (!formData.eveningTimings?.startTime && formData.eveningTimings?.endTime) {
-        errors.eveningStartTime = 'Evening start time is required';
-      }
-    }
-
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    setFormErrors({});
+    return true;
   };
 
   const handleAddItem = async () => {
@@ -102,7 +128,7 @@ export const MenuManagement: React.FC = () => {
       resetForm();
     } catch (err) {
       console.error(err);
-      alert('Failed to add menu item');
+      toast.error('Failed to add menu item');
     } finally {
       setLoading(false);
     }
@@ -120,7 +146,7 @@ export const MenuManagement: React.FC = () => {
       resetForm();
     } catch (err) {
       console.error(err);
-      alert('Failed to update menu item');
+      toast.error('Failed to update menu item');
     } finally {
       setLoading(false);
     }
@@ -137,7 +163,7 @@ export const MenuManagement: React.FC = () => {
       setSelectedItem(null);
     } catch (err) {
       console.error(err);
-      alert('Failed to delete menu item');
+      toast.error('Failed to delete menu item');
     } finally {
       setLoading(false);
     }
@@ -333,7 +359,7 @@ export const MenuManagement: React.FC = () => {
         }}
         title={`${isEditModalVisible ? 'Edit' : 'Add'} Menu Item`}
       >
-        <div className="space-y-10 max-h-[75vh] overflow-y-auto px-2 sm:px-4 py-4 scrollbar-hide">
+        <div className="space-y-10 px-2 sm:px-4 py-4">
           
           {/* Section 1: Basic Information */}
           <div className="space-y-6">

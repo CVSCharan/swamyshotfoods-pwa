@@ -10,6 +10,7 @@ import { Login } from './pages/Login';
 import { ShopStatus } from './pages/ShopStatus';
 import { MenuManagement } from './pages/MenuManagement';
 import { AddUser } from './pages/AddUser';
+import { Toaster } from './components/ui/Toaster';
 
 // Route Guard for Authenticated Users
 interface ProtectedRouteProps {
@@ -146,6 +147,7 @@ function App() {
           {/* Catch All Redirect */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <Toaster />
       </SSEManager>
     </BrowserRouter>
   );

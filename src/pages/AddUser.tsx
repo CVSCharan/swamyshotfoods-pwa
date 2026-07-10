@@ -1,72 +1,66 @@
 import React, { useState } from 'react';
 import { User as UserIcon, Lock, Image as ImageIcon, ShieldAlert } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { authService } from '../services/authService';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 
+const addUserSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  confirmPassword: z.string(),
+  role: z.enum(['admin', 'staff', 'user']),
+  pic: z.string().optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
+type AddUserFormValues = z.infer<typeof addUserSchema>;
+
 export const AddUser: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [pic, setPic] = useState('');
-  const [role, setRole] = useState<'admin' | 'staff' | 'user'>('user');
-  
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AddUserFormValues>({
+    resolver: zodResolver(addUserSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+      confirmPassword: '',
+      role: 'user',
+      pic: '',
+    },
+  });
 
-    if (!username.trim()) {
-      newErrors.username = 'Username is required';
-    } else if (username.length < 3) {
-      newErrors.username = 'Username must be at least 3 characters';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: AddUserFormValues) => {
     setSuccessMsg(null);
-
-    if (!validateForm()) return;
-
+    setApiError(null);
     setLoading(true);
 
     try {
       await authService.register({
-        username: username.trim(),
-        password,
-        role,
-        ...(pic.trim() && { pic: pic.trim() }),
+        username: data.username.trim(),
+        password: data.password,
+        role: data.role,
+        ...(data.pic?.trim() ? { pic: data.pic.trim() } : {}),
       });
 
-      setSuccessMsg(`User "${username}" has been successfully added with the role of ${role}!`);
+      setSuccessMsg(`User "${data.username}" has been successfully added with the role of ${data.role}!`);
       
-      // Reset Form
-      setUsername('');
-      setPassword('');
-      setConfirmPassword('');
-      setPic('');
-      setRole('user');
-      setErrors({});
+      reset();
     } catch (err: any) {
       console.error(err);
-      setErrors({ api: err.message || 'Registration failed. Please try again.' });
+      setApiError(err.message || 'Registration failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -90,7 +84,7 @@ export const AddUser: React.FC = () => {
           <CardDescription>Enter details below to create a login account</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleRegister} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             
             {successMsg && (
               <div className="text-xs font-semibold text-emerald-500 bg-emerald-500/10 border border-emerald-500/25 px-4 py-3 rounded-xl">
@@ -98,21 +92,17 @@ export const AddUser: React.FC = () => {
               </div>
             )}
 
-            {errors.api && (
+            {apiError && (
               <div className="text-xs font-semibold text-red-500 bg-red-500/10 border border-red-500/25 px-4 py-3 rounded-xl flex items-center gap-2">
                 <ShieldAlert size={16} />
-                {errors.api}
+                {apiError}
               </div>
             )}
 
             <Input
               label="Username *"
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                if (errors.username) setErrors({ ...errors, username: '' });
-              }}
-              error={errors.username}
+              {...register('username')}
+              error={errors.username?.message}
               autoCapitalize="none"
               leftIcon={UserIcon}
               placeholder="E.g. Chefswamy"
@@ -122,12 +112,8 @@ export const AddUser: React.FC = () => {
             <Input
               label="Password *"
               type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (errors.password) setErrors({ ...errors, password: '' });
-              }}
-              error={errors.password}
+              {...register('password')}
+              error={errors.password?.message}
               leftIcon={Lock}
               placeholder="Min 6 characters"
               disabled={loading}
@@ -136,12 +122,8 @@ export const AddUser: React.FC = () => {
             <Input
               label="Confirm Password *"
               type="password"
-              value={confirmPassword}
-              onChange={(e) => {
-                setConfirmPassword(e.target.value);
-                if (errors.confirmPassword) setErrors({ ...errors, confirmPassword: '' });
-              }}
-              error={errors.confirmPassword}
+              {...register('confirmPassword')}
+              error={errors.confirmPassword?.message}
               leftIcon={Lock}
               placeholder="Confirm password"
               disabled={loading}
@@ -153,8 +135,7 @@ export const AddUser: React.FC = () => {
                 System Role *
               </label>
               <select
-                value={role}
-                onChange={(e) => setRole(e.target.value as any)}
+                {...register('role')}
                 disabled={loading}
                 className="w-full px-4 py-3 glass-input rounded-xl text-sm bg-white border border-neutral-200 text-neutral-900 focus:ring-2 focus:ring-saffron-500/20 focus:border-saffron-500 focus:outline-none transition-all cursor-pointer"
               >
@@ -162,12 +143,13 @@ export const AddUser: React.FC = () => {
                 <option value="staff" className="bg-white">Staff (Chef / Crew)</option>
                 <option value="admin" className="bg-white">Admin (Owner)</option>
               </select>
+              {errors.role && <p className="text-xs text-red-500 mt-1">{errors.role.message}</p>}
             </div>
 
             <Input
               label="Profile Picture URL (Optional)"
-              value={pic}
-              onChange={(e) => setPic(e.target.value)}
+              {...register('pic')}
+              error={errors.pic?.message}
               leftIcon={ImageIcon}
               placeholder="Https://example.com/avatar.jpg"
               disabled={loading}
