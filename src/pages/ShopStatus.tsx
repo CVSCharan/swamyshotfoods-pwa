@@ -41,6 +41,7 @@ export const ShopStatus: React.FC = () => {
   // Image Upload Safeguards
   const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MiB raw file limit
   const MAX_AVATAR_DIMENSION = 800; // max width/height for avatar
+  const MAX_AVATAR_DATA_URL_LENGTH = 1000000; // 1 MB Data URL ceiling matching API schema
   const JPEG_QUALITY = 0.7;
   const ALLOWED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
   const ALLOWED_COOKING_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -110,6 +111,11 @@ export const ShopStatus: React.FC = () => {
           const dataUrl = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
           if (!dataUrl || !dataUrl.startsWith('data:image/jpeg;base64,')) {
             reject(new Error('Failed to encode compressed image.'));
+            return;
+          }
+
+          if (dataUrl.length > MAX_AVATAR_DATA_URL_LENGTH) {
+            reject(new Error('Compressed avatar photo exceeds maximum allowed size (1MB). Please select a simpler image.'));
             return;
           }
 
